@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+# Security tools pages
+Allow: /password-generator
+Allow: /text-encryptor
+Allow: /security-headers-checker
+Allow: /two-factor-auth
+Allow: /random-data-generator
+Allow: /password-strength-analyzer
+
+# Content pages
+Allow: /blog
+Allow: /about
+Allow: /faq
+Allow: /comparisons
+Allow: /privacy-policy
+Allow: /terms-of-service
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://securetools.dev/sitemap.xml
+
+# Security-focused crawling
+Crawl-delay: 1

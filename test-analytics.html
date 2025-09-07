@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Test - SecureTools</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #console { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin: 20px 0; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Google Analytics Test - SecureTools</h1>
+    
+    <div id="status">
+        <div class="info">Testing Google Analytics setup...</div>
+    </div>
+
+    <h2>Test Actions</h2>
+    <button onclick="testPageView()">Test Page View</button>
+    <button onclick="testToolUsage()">Test Tool Usage</button>
+    <button onclick="testUserInteraction()">Test User Interaction</button>
+    <button onclick="testPerformance()">Test Performance</button>
+    <button onclick="clearConsole()">Clear Console</button>
+
+    <h2>Console Output</h2>
+    <div id="console"></div>
+
+    <h2>Analytics Status</h2>
+    <div id="analytics-status">
+        <div>Google Analytics ID: <span id="ga-id">Checking...</span></div>
+        <div>gtag function: <span id="gtag-status">Checking...</span></div>
+        <div>Data Layer: <span id="datalayer-status">Checking...</span></div>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQ9REBSGME"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-YQ9REBSGME', {
+            page_title: document.title,
+            page_location: window.location.href,
+        });
+
+        // Test functions
+        function log(message) {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            console.textContent += `[${timestamp}] ${message}\n`;
+        }
+
+        function testPageView() {
+            log('Testing page view...');
+            gtag('event', 'page_view', {
+                page_title: 'Analytics Test Page',
+                page_location: window.location.href,
+                page_path: '/test'
+            });
+            log('✅ Page view event sent');
+        }
+
+        function testToolUsage() {
+            log('Testing tool usage...');
+            gtag('event', 'tool_usage', {
+                tool_name: 'Word Counter',
+                action: 'test',
+                test_mode: true
+            });
+            log('✅ Tool usage event sent');
+        }
+
+        function testUserInteraction() {
+            log('Testing user interaction...');
+            gtag('event', 'user_interaction', {
+                interaction_type: 'button_click',
+                tool_name: 'test',
+                test_mode: true
+            });
+            log('✅ User interaction event sent');
+        }
+
+        function testPerformance() {
+            log('Testing performance metric...');
+            gtag('event', 'performance_metric', {
+                metric_name: 'test_metric',
+                metric_value: Math.random() * 1000,
+                tool_name: 'test'
+            });
+            log('✅ Performance metric sent');
+        }
+
+        function clearConsole() {
+            document.getElementById('console').textContent = '';
+        }
+
+        // Check analytics status
+        function checkAnalyticsStatus() {
+            const gaId = document.getElementById('ga-id');
+            const gtagStatus = document.getElementById('gtag-status');
+            const datalayerStatus = document.getElementById('datalayer-status');
+
+            // Check Google Analytics ID
+            gaId.textContent = 'G-YQ9REBSGME';
+            gaId.style.color = 'green';
+
+            // Check gtag function
+            if (typeof window.gtag === 'function') {
+                gtagStatus.textContent = '✅ Available';
+                gtagStatus.style.color = 'green';
+            } else {
+                gtagStatus.textContent = '❌ Not available';
+                gtagStatus.style.color = 'red';
+            }
+
+            // Check data layer
+            if (Array.isArray(window.dataLayer)) {
+                datalayerStatus.textContent = `✅ Available (${window.dataLayer.length} items)`;
+                datalayerStatus.style.color = 'green';
+            } else {
+                datalayerStatus.textContent = '❌ Not available';
+                datalayerStatus.style.color = 'red';
+            }
+
+            // Update status
+            const status = document.getElementById('status');
+            if (typeof window.gtag === 'function' && Array.isArray(window.dataLayer)) {
+                status.innerHTML = '<div class="success">✅ Google Analytics is working correctly!</div>';
+                log('✅ Google Analytics initialized successfully');
+            } else {
+                status.innerHTML = '<div class="error">❌ Google Analytics is not working. Check console for errors.</div>';
+                log('❌ Google Analytics failed to initialize');
+            }
+        }
+
+        // Run checks when page loads
+        window.addEventListener('load', () => {
+            setTimeout(checkAnalyticsStatus, 1000);
+        });
+
+        // Log all gtag calls
+        const originalGtag = window.gtag;
+        window.gtag = function() {
+            log(`gtag called: ${JSON.stringify(Array.from(arguments))}`);
+            return originalGtag.apply(this, arguments);
+        };
+    </script>
+</body>
+</html>

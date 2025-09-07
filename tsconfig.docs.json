@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./docs"
+  },
+  "include": [
+    "src/lib/text/*.ts",
+    "src/lib/utils.ts",
+    "src/lib/analytics.ts",
+    "src/lib/performance.ts",
+    "src/lib/errorReporting.ts",
+    "src/hooks/*.ts",
+    "src/components/ui/*.ts"
+  ],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/__tests__/**",
+    "**/test/**",
+    "**/pages/**",
+    "**/temp_backup/**"
+  ]
+}

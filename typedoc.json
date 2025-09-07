@@ -1,0 +1,89 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src"
+  ],
+  "tsconfig": "tsconfig.app.json",
+  "out": "docs",
+  "name": "SecureTools Documentation",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/__tests__/**",
+    "**/test/**"
+  ],
+  "readme": "SECURETOOLS-DOCUMENTATION-GUIDE.md",
+  "theme": "default",
+  "customCss": "typedoc-custom.css",
+  "customJs": "assets/force-light-theme.js",
+  "categorizeByGroup": true,
+  "defaultCategory": "Other",
+  "categoryOrder": [
+    "Security Tools",
+    "Core Infrastructure",
+    "Analytics & Monitoring",
+    "UI Components",
+    "Hooks",
+    "Utilities",
+    "Other"
+  ],
+  "sort": [
+    "source-order"
+  ],
+  "kindSortOrder": [
+    "Project",
+    "Module",
+    "Namespace",
+    "Enum",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Variable",
+    "Function",
+    "Accessor",
+    "Method",
+    "TypeLiteral"
+  ],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "searchInComments": true,
+  "cleanOutputDir": true,
+  "exclude": [
+    "**/*.test.tsx",
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "**/test/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/vitest.config.ts",
+    "**/setup.ts"
+  ],
+  "externalPattern": [
+    "**/node_modules/**"
+  ],
+  "excludeNotDocumented": false,
+  "excludeInternal": true,
+  "gitRevision": "main",
+  "gitRemote": "origin",
+  "plugin": [],
+  "disableSources": false,
+  "sourceLinkTemplate": "",
+  "treatWarningsAsErrors": false,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "commentStyle": "jsdoc",
+  "entryPointStrategy": "expand",
+  "preserveWatchOutput": true,
+  "lightHighlightTheme": "github-light",
+  "darkHighlightTheme": "github-light"
+}
