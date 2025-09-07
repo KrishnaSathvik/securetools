@@ -8,7 +8,7 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://securetools.dev/</loc>
+    <loc>https://www.securetools.dev/</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -16,42 +16,42 @@
   
   <!-- Security Tools -->
   <url>
-    <loc>https://securetools.dev/password-generator</loc>
+    <loc>https://www.securetools.dev/password-generator</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/text-encryptor</loc>
+    <loc>https://www.securetools.dev/text-encryptor</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/security-headers-checker</loc>
+    <loc>https://www.securetools.dev/security-headers-checker</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/two-factor-auth</loc>
+    <loc>https://www.securetools.dev/two-factor-auth</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/random-data-generator</loc>
+    <loc>https://www.securetools.dev/random-data-generator</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/password-strength-analyzer</loc>
+    <loc>https://www.securetools.dev/password-strength-analyzer</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -59,42 +59,42 @@
   
   <!-- Content Pages -->
   <url>
-    <loc>https://securetools.dev/blog</loc>
+    <loc>https://www.securetools.dev/blog</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/about</loc>
+    <loc>https://www.securetools.dev/about</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/faq</loc>
+    <loc>https://www.securetools.dev/faq</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/comparisons</loc>
+    <loc>https://www.securetools.dev/comparisons</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/privacy-policy</loc>
+    <loc>https://www.securetools.dev/privacy-policy</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://securetools.dev/terms-of-service</loc>
+    <loc>https://www.securetools.dev/terms-of-service</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

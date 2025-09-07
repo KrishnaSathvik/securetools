@@ -14,7 +14,7 @@ This guide will help you set up Google Analytics 4 for SecureTools with security
 2. Click "Start measuring" or "Create Account"
 3. Enter account name: "SecureTools"
 4. Choose "Web" as the platform
-5. Enter website URL: `https://securetools.dev`
+5. Enter website URL: `https://www.securetools.dev`
 6. Select industry: "Technology" or "Software"
 7. Choose reporting time zone: Your preferred timezone
 8. Accept data processing terms
@@ -24,7 +24,7 @@ This guide will help you set up Google Analytics 4 for SecureTools with security
 1. In your GA4 property, go to "Admin" (gear icon)
 2. Under "Property", click "Data Streams"
 3. Click "Add stream" → "Web"
-4. Enter website URL: `https://securetools.dev`
+4. Enter website URL: `https://www.securetools.dev`
 5. Enter stream name: "SecureTools Website"
 6. Copy the Measurement ID (format: G-XXXXXXXXXX)
 

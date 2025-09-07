@@ -23,7 +23,7 @@ Disallow: /private/
 Disallow: /api/
 
 # Sitemap
-Sitemap: https://securetools.dev/sitemap.xml
+Sitemap: https://www.securetools.dev/sitemap.xml
 
 # Security-focused crawling
 Crawl-delay: 1
