@@ -147,7 +147,7 @@ export default function RandomDataGenerator() {
 
   const handleGenerate = () => {
     try {
-      let results: string[] = [];
+      const results: string[] = [];
       
       switch (activeTab) {
         case 'strings':

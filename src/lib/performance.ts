@@ -48,7 +48,7 @@ class PerformanceMonitor {
    */
   private trackCLS() {
     let clsValue = 0;
-    let clsEntries: PerformanceEntry[] = [];
+    const clsEntries: PerformanceEntry[] = [];
 
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
@@ -281,7 +281,7 @@ export const trackEnhancedWebVitals = () => {
 
   // Track CLS (Cumulative Layout Shift)
   let clsValue = 0;
-  let clsEntries: PerformanceEntry[] = [];
+  const clsEntries: PerformanceEntry[] = [];
   
   const clsObserver = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
