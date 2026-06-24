@@ -10,8 +10,8 @@
   "scripts": {
     "predev": "node scripts/generate-blog-routes.mjs",
     "dev": "vite",
-    "build": "node scripts/generate-blog-routes.mjs && node scripts/generate-sitemap.mjs && vite build && node scripts/generate-route-html.mjs && node scripts/prerender-full-html.mjs",
-    "vercel-build": "npx playwright install chromium && npm run build",
+    "build": "node scripts/generate-blog-routes.mjs && node scripts/generate-sitemap.mjs && vite build && node scripts/generate-route-html.mjs && node scripts/run-prerender.mjs",
+    "vercel-build": "npm run build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",

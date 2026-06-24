@@ -12,6 +12,18 @@ const root = path.resolve(__dirname, '..');
 const distDir = path.join(root, 'dist');
 const indexPath = path.join(distDir, 'index.html');
 
+function injectSeoFallback(html, { title, description }) {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const block = `
+    <noscript>
+      <main style="max-width:48rem;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6">
+        <h1>${esc(title)}</h1>
+        <p>${esc(description)}</p>
+      </main>
+    </noscript>`;
+  return html.replace('</body>', `${block}\n  </body>`);
+}
+
 function injectMeta(html, { title, description, keywords, canonical }) {
   let out = html;
   const esc = (s) => s.replace(/"/g, '&quot;');
@@ -59,12 +71,16 @@ const routes = getRouteMetaList();
 let generated = 0;
 
 for (const route of routes) {
-  if (route.path === '/') continue;
-  const html = injectMeta(baseHtml, route);
+  let html = injectMeta(baseHtml, route);
+  html = injectSeoFallback(html, route);
+  if (route.path === '/') {
+    fs.writeFileSync(indexPath, html);
+    continue;
+  }
   const dir = path.join(distDir, route.path.replace(/^\//, ''));
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'index.html'), html);
   generated += 1;
 }
 
-console.log(`Generated ${generated} route metadata HTML shells in dist/`);
+console.log(`Generated ${generated + 1} route metadata HTML shells in dist/`);
