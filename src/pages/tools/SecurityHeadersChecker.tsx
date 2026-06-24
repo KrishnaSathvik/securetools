@@ -21,11 +21,13 @@ import {
   Lock,
   Eye,
   AlertCircle,
-  Target,
   Zap
 } from 'lucide-react';
+import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
+import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
 
 interface SecurityHeader {
   name: string;
@@ -46,23 +48,7 @@ interface SSLInfo {
   cipher?: string;
 }
 
-export default function SecurityHeadersChecker() {
-  const [url, setUrl] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [securityHeaders, setSecurityHeaders] = useState<SecurityHeader[]>([]);
-  const [sslInfo, setSslInfo] = useState<SSLInfo | null>(null);
-  const [overallScore, setOverallScore] = useState(0);
-  const [error, setError] = useState('');
-  const { toast } = useToast();
-
-  useSEO({
-    title: 'Security Headers Checker - Website Security Analysis Tool | SecureTools',
-    description: 'Analyze website security headers, SSL/TLS certificates, and vulnerability assessment. Check HSTS, CSP, X-Frame-Options, and other security headers.',
-    keywords: 'security headers checker, SSL checker, website security, HSTS, CSP, X-Frame-Options, security analysis, vulnerability assessment',
-    canonical: 'https://www.securetools.dev/security-headers-checker'
-  });
-
-  const securityHeadersList: Omit<SecurityHeader, 'present' | 'value' | 'status'>[] = [
+const SECURITY_HEADERS_LIST: Omit<SecurityHeader, 'present' | 'value' | 'status'>[] = [
     {
       name: 'Strict-Transport-Security (HSTS)',
       description: 'Forces HTTPS connections and prevents protocol downgrade attacks',
@@ -105,13 +91,35 @@ export default function SecurityHeadersChecker() {
     }
   ];
 
+export default function SecurityHeadersChecker() {
+  const [url, setUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [securityHeaders, setSecurityHeaders] = useState<SecurityHeader[]>([]);
+  const [sslInfo, setSslInfo] = useState<SSLInfo | null>(null);
+  const [overallScore, setOverallScore] = useState(0);
+  const [error, setError] = useState('');
+  const { toast } = useToast();
+
+  useSEO({
+    title: 'Security Headers Checker (Demo) | SecureTools',
+    description:
+      'Educational demo that explains common HTTP security headers. Does not perform live remote scanning from the browser.',
+    keywords: 'security headers, HSTS, CSP, X-Frame-Options, educational demo, browser security',
+    canonical: 'https://www.securetools.dev/security-headers-checker',
+    structuredData: buildWebApplicationSchema({
+      name: 'Security Headers Checker (Demo)',
+      description: 'Educational security headers review demo.',
+      path: '/security-headers-checker',
+    }),
+  });
+
   const analyzeSecurityHeaders = useCallback(async (targetUrl: string) => {
     try {
       // Note: Due to CORS restrictions, we can't directly fetch headers from arbitrary URLs
       // This is a simulation of what the analysis would look like
       // In a real implementation, you'd need a backend service to fetch headers
       
-      const mockHeaders: SecurityHeader[] = securityHeadersList.map(header => {
+      const mockHeaders: SecurityHeader[] = SECURITY_HEADERS_LIST.map(header => {
         const random = Math.random();
         let status: 'good' | 'warning' | 'error' | 'missing';
         let present = false;
@@ -167,7 +175,7 @@ export default function SecurityHeadersChecker() {
     } catch (err) {
       setError('Failed to analyze security headers: ' + (err as Error).message);
     }
-  }, [securityHeadersList, toast]);
+  }, [toast]);
 
   const getMockHeaderValue = (headerName: string, isWarning = false): string => {
     const values: Record<string, { good: string; warning: string }> = {
@@ -246,11 +254,11 @@ export default function SecurityHeadersChecker() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'good':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+        return <AlertTriangle className="h-4 w-4 text-warning" />;
       case 'error':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-destructive" />;
       case 'missing':
         return <XCircle className="h-4 w-4 text-gray-400" />;
       default:
@@ -261,11 +269,11 @@ export default function SecurityHeadersChecker() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'good':
-        return <Badge className="bg-green-500">Good</Badge>;
+        return <Badge className="bg-success">Good</Badge>;
       case 'warning':
-        return <Badge className="bg-yellow-500">Warning</Badge>;
+        return <Badge className="bg-warning">Warning</Badge>;
       case 'error':
-        return <Badge className="bg-red-500">Error</Badge>;
+        return <Badge className="bg-destructive">Error</Badge>;
       case 'missing':
         return <Badge variant="outline">Missing</Badge>;
       default:
@@ -273,21 +281,45 @@ export default function SecurityHeadersChecker() {
     }
   };
 
+  const toolTrust = {
+    badges: [
+      { label: 'Demo', variant: 'demo' as const },
+      { label: 'Local', variant: 'local' as const },
+    ],
+    callouts: [
+      {
+        variant: 'warning' as const,
+        content: (
+          <>
+            <strong>Demo only:</strong> Browsers block reading response headers from other sites (CORS).
+            Results here are simulated for education — not a live scan of the URL you enter.
+          </>
+        ),
+      },
+    ],
+    howItWorks:
+      'This educational demo generates sample header values locally to teach what common HTTP security headers do and how they are typically configured.',
+    limitations:
+      'Browsers block reading response headers from arbitrary websites (CORS). Results are simulated — not fetched from the URL you enter. Real header validation requires server-side scanning or infrastructure you control.',
+    privacyNote:
+      'The URL you type is used only as demo context in your browser. No scan request is sent to SecureTools servers.',
+  };
+
   return (
     <ToolLayout
-      title="Security Headers Checker"
-      description="Analyze website security headers, SSL/TLS certificates, and vulnerability assessment. Check HSTS, CSP, X-Frame-Options, and other security headers."
+      title="Security Headers Checker (Demo)"
+      description="Learn what common HTTP security headers do. This browser demo does not fetch live headers from arbitrary websites."
     >
       <div className="max-w-6xl mx-auto space-y-6">
         {/* URL Input */}
-        <Card>
+        <Card className="tool-workspace">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
-              Website Security Analysis
+            <CardTitle className="flex items-center gap-2 flex-wrap">
+              <Globe className="h-5 w-5" aria-hidden />
+              Simulated Header Review
             </CardTitle>
             <CardDescription>
-              Enter a URL to analyze its security headers and SSL/TLS configuration
+              Enter any URL to run an educational demo — sample header values are generated locally, not fetched from the site.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -312,14 +344,17 @@ export default function SecurityHeadersChecker() {
                     ) : (
                       <Search className="h-4 w-4" />
                     )}
-                    {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+                    {isAnalyzing ? 'Running demo...' : 'Run demo review'}
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Example only — results are simulated in your browser.
+                </p>
               </div>
               
               {url && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>Analyzing:</span>
+                  <span>Demo context for:</span>
                   <code className="bg-muted px-2 py-1 rounded">{url}</code>
                   <Button
                     variant="ghost"
@@ -351,7 +386,7 @@ export default function SecurityHeadersChecker() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5" />
-                  Security Score
+                  Educational demo score
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -360,11 +395,11 @@ export default function SecurityHeadersChecker() {
                     <span className="text-2xl font-bold">{overallScore}%</span>
                     <div className="flex items-center gap-2">
                       {overallScore >= 80 ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-success" />
                       ) : overallScore >= 60 ? (
-                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                        <AlertTriangle className="h-5 w-5 text-warning" />
                       ) : (
-                        <XCircle className="h-5 w-5 text-red-500" />
+                        <XCircle className="h-5 w-5 text-destructive" />
                       )}
                       <span className="text-sm text-muted-foreground">
                         {overallScore >= 80 ? 'Good' : overallScore >= 60 ? 'Needs Improvement' : 'Poor'}
@@ -379,9 +414,9 @@ export default function SecurityHeadersChecker() {
             {/* Security Headers */}
             <Card>
               <CardHeader>
-                <CardTitle>Security Headers Analysis</CardTitle>
+                <CardTitle>Sample Security Headers (Simulated)</CardTitle>
                 <CardDescription>
-                  Analysis of HTTP security headers and their configuration
+                  Example header values generated locally for learning — not read from the live site
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -423,7 +458,7 @@ export default function SecurityHeadersChecker() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Lock className="h-5 w-5" />
-                    SSL/TLS Certificate Information
+                    Simulated SSL/TLS Information (Demo)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -431,11 +466,11 @@ export default function SecurityHeadersChecker() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         {sslInfo.valid ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                         ) : (
-                          <XCircle className="h-4 w-4 text-red-500" />
+                          <XCircle className="h-4 w-4 text-destructive" />
                         )}
-                        <span className="font-medium">Certificate Status</span>
+                        <span className="font-medium">Certificate Status (simulated)</span>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {sslInfo.valid ? 'Valid' : 'Invalid or Expired'}
@@ -469,42 +504,35 @@ export default function SecurityHeadersChecker() {
           </div>
         )}
 
-        {/* Why Use + Key Features */}
+        {/* What this demo is / is not */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Why Use Security Headers Checker?
+                <CheckCircle className="h-5 w-5 text-success" />
+                What this demo is good for
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Website Security Assessment</p>
-                  <p className="text-sm text-muted-foreground">Analyze website security headers to identify vulnerabilities and improve your site's security posture.</p>
+                  <p className="font-medium">Learning common headers</p>
+                  <p className="text-sm text-muted-foreground">See what headers like CSP, HSTS, and X-Frame-Options are meant to do.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">SSL/TLS Certificate Validation</p>
-                  <p className="text-sm text-muted-foreground">Check certificate validity, issuer information, and encryption strength to ensure secure connections.</p>
+                  <p className="font-medium">Understanding CSP / HSTS / X-Frame-Options</p>
+                  <p className="text-sm text-muted-foreground">Review sample values and recommendations in plain language.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Comprehensive Security Score</p>
-                  <p className="text-sm text-muted-foreground">Get an overall security rating and detailed recommendations for improving your website's security.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Security Best Practices</p>
-                  <p className="text-sm text-muted-foreground">Learn about essential security headers like HSTS, CSP, and X-Frame-Options for better protection.</p>
+                  <p className="font-medium">Preparing a checklist</p>
+                  <p className="text-sm text-muted-foreground">Use the demo as a study aid before validating headers on your own server or CI pipeline.</p>
                 </div>
               </div>
             </CardContent>
@@ -513,85 +541,91 @@ export default function SecurityHeadersChecker() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Key Features
+                <XCircle className="h-5 w-5 text-destructive" />
+                What this demo is not
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Security headers analysis</span>
+              <div className="flex items-start gap-3">
+                <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Not a live security audit</p>
+                  <p className="text-sm text-muted-foreground">Browsers cannot reliably read arbitrary sites&apos; response headers from client-side JavaScript.</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">SSL/TLS certificate checking</span>
+              <div className="flex items-start gap-3">
+                <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Not certificate validation</p>
+                  <p className="text-sm text-muted-foreground">SSL/TLS details shown here are simulated examples, not live certificate checks.</p>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Overall security scoring</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">HSTS, CSP, X-Frame-Options analysis</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Security recommendations</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Vulnerability assessment</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Privacy-focused (all processing in browser)</span>
+              <div className="flex items-start gap-3">
+                <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Not a replacement for server-side scanning</p>
+                  <p className="text-sm text-muted-foreground">Use your hosting provider, security scanner, or controlled proxy for real validation.</p>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Security Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Security Headers Analyzed</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>Content-Security-Policy:</strong> Prevents XSS attacks</li>
-                  <li>• <strong>X-Frame-Options:</strong> Prevents clickjacking</li>
-                  <li>• <strong>X-Content-Type-Options:</strong> Prevents MIME sniffing</li>
-                  <li>• <strong>Strict-Transport-Security:</strong> Enforces HTTPS</li>
-                  <li>• <strong>Referrer-Policy:</strong> Controls referrer information</li>
-                  <li>• <strong>Permissions-Policy:</strong> Controls browser features</li>
+        <ToolTrustSection {...toolTrust} />
+
+        <ToolDetailsAccordion
+          title="Learn more about this demo"
+          sections={[
+            buildTrustDetailsAccordionSection(toolTrust),
+            {
+              id: 'demo-features',
+              title: 'Demo features',
+              content: (
+                <ul className="space-y-2 list-disc pl-5">
+                  <li>Simulated security header examples</li>
+                  <li>Educational demo score (not a live rating)</li>
+                  <li>HSTS, CSP, X-Frame-Options explanations</li>
+                  <li>Sample SSL/TLS panel labeled as simulated</li>
+                  <li>Privacy-focused — all processing in browser</li>
                 </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Analysis Features</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• Real-time header inspection</li>
-                  <li>• Security score calculation</li>
-                  <li>• Detailed recommendations</li>
-                  <li>• CORS policy validation</li>
-                  <li>• CSP policy analysis</li>
-                  <li>• Privacy-focused (no data stored)</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Badge variant="secondary">Security Headers</Badge>
-              <Badge variant="secondary">CSP Analysis</Badge>
-              <Badge variant="secondary">CORS Validation</Badge>
-              <Badge variant="secondary">Privacy Focused</Badge>
-            </div>
-          </CardContent>
-        </Card>
+              ),
+            },
+            {
+              id: 'security-info',
+              title: 'Security information',
+              content: (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Security headers analyzed</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li><strong>Content-Security-Policy:</strong> Helps mitigate XSS</li>
+                      <li><strong>X-Frame-Options:</strong> Helps prevent clickjacking</li>
+                      <li><strong>X-Content-Type-Options:</strong> Helps prevent MIME sniffing</li>
+                      <li><strong>Strict-Transport-Security:</strong> Enforces HTTPS</li>
+                      <li><strong>Referrer-Policy:</strong> Controls referrer information</li>
+                      <li><strong>Permissions-Policy:</strong> Controls browser features</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">What this demo covers</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li>Sample header presence and values</li>
+                      <li>Educational security score (simulated)</li>
+                      <li>Explanations and recommendations</li>
+                      <li>No data sent to SecureTools servers</li>
+                      <li>Not a substitute for server-side scanning</li>
+                    </ul>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">Educational Demo</Badge>
+                    <Badge variant="secondary">Security Headers</Badge>
+                    <Badge variant="secondary">Local Only</Badge>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
       </div>
     </ToolLayout>
   );

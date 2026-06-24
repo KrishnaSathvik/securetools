@@ -1,5 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ToolLayout } from '@/components/layouts/ToolLayout';
+import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
+import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,7 +28,19 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
 import { trackPasswordAnalysis, trackConversion } from '@/lib/analytics';
+
+const COMMON_PASSWORDS = [
+  'password', '123456', '123456789', 'qwerty', 'abc123', 'password123',
+  'admin', 'letmein', 'welcome', 'monkey', '1234567890', 'password1',
+  'qwerty123', 'dragon', 'master', 'hello', 'freedom', 'whatever'
+];
+
+const KEYBOARD_PATTERNS = [
+  'qwerty', 'asdfgh', 'zxcvbn', '123456', '654321',
+  'qwertyuiop', 'asdfghjkl', 'zxcvbnm'
+];
 
 interface PasswordAnalysis {
   score: number;
@@ -57,25 +72,18 @@ export default function PasswordStrengthAnalyzer() {
   const { toast } = useToast();
 
   useSEO({
-    title: 'Password Strength Analyzer - Security Analysis Tool | SecureTools',
-    description: 'Analyze password strength, detect common patterns, and provide security recommendations. Comprehensive password security analysis tool that runs entirely in your browser.',
-    keywords: 'password strength analyzer, password security, password checker, entropy analysis, crack time, password recommendations, security tools',
-    canonical: 'https://www.securetools.dev/password-strength-analyzer'
+    title: 'Password Strength Analyzer | SecureTools',
+    description:
+      'Analyze password strength, entropy, and common patterns locally. Pattern-based analysis only — no live breach database lookup.',
+    keywords: 'password strength analyzer, password security, password checker, entropy analysis, security tools',
+    canonical: 'https://www.securetools.dev/password-strength-analyzer',
+    structuredData: buildWebApplicationSchema({
+      name: 'Password Strength Analyzer',
+      description: 'Local password strength and pattern analysis.',
+      path: '/password-strength-analyzer',
+    }),
   });
 
-  // Common weak passwords and patterns
-  const commonPasswords = [
-    'password', '123456', '123456789', 'qwerty', 'abc123', 'password123',
-    'admin', 'letmein', 'welcome', 'monkey', '1234567890', 'password1',
-    'qwerty123', 'dragon', 'master', 'hello', 'freedom', 'whatever'
-  ];
-
-  const keyboardPatterns = [
-    'qwerty', 'asdfgh', 'zxcvbn', '123456', '654321',
-    'qwertyuiop', 'asdfghjkl', 'zxcvbnm'
-  ];
-
-  // Calculate password entropy
   const calculateEntropy = useCallback((password: string): number => {
     let charsetSize = 0;
     
@@ -108,8 +116,8 @@ export default function PasswordStrengthAnalyzer() {
     return {
       hasSequential: /(012|123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/.test(lowerPassword),
       hasRepeated: /(.)\1{2,}/.test(password),
-      hasCommonPattern: commonPasswords.some(common => lowerPassword.includes(common)),
-      hasKeyboardPattern: keyboardPatterns.some(pattern => lowerPassword.includes(pattern))
+      hasCommonPattern: COMMON_PASSWORDS.some(common => lowerPassword.includes(common)),
+      hasKeyboardPattern: KEYBOARD_PATTERNS.some(pattern => lowerPassword.includes(pattern))
     };
   }, []);
 
@@ -277,36 +285,66 @@ export default function PasswordStrengthAnalyzer() {
 
   const getStrengthColor = (strength: string) => {
     switch (strength) {
-      case 'Very Weak': return 'text-red-500';
-      case 'Weak': return 'text-red-400';
-      case 'Fair': return 'text-yellow-500';
-      case 'Good': return 'text-blue-500';
-      case 'Strong': return 'text-green-500';
-      case 'Very Strong': return 'text-green-600';
-      default: return 'text-gray-500';
+      case 'Very Weak': return 'text-destructive';
+      case 'Weak': return 'text-destructive';
+      case 'Fair': return 'text-warning';
+      case 'Good': return 'text-info';
+      case 'Strong': return 'text-success';
+      case 'Very Strong': return 'text-success';
+      default: return 'text-muted-foreground';
     }
   };
 
   const getStrengthBadgeColor = (strength: string) => {
     switch (strength) {
-      case 'Very Weak': return 'bg-red-500';
-      case 'Weak': return 'bg-red-400';
-      case 'Fair': return 'bg-yellow-500';
-      case 'Good': return 'bg-blue-500';
-      case 'Strong': return 'bg-green-500';
-      case 'Very Strong': return 'bg-green-600';
-      default: return 'bg-gray-500';
+      case 'Very Weak': return 'bg-destructive';
+      case 'Weak': return 'bg-destructive';
+      case 'Fair': return 'bg-warning';
+      case 'Good': return 'bg-info';
+      case 'Strong': return 'bg-success';
+      case 'Very Strong': return 'bg-success';
+      default: return 'bg-muted';
     }
+  };
+
+  const toolTrust = {
+    badges: [
+      { label: 'Pattern only', variant: 'pattern' as const },
+      { label: 'No breach DB', variant: 'no-breach' as const },
+      { label: 'Approximate estimate', variant: 'approximate' as const },
+    ],
+    callouts: [
+      {
+        variant: 'warning' as const,
+        content: (
+          <>
+            This analyzer checks patterns, length, and character variety locally. It does{' '}
+            <strong>not</strong> check breach databases or know whether a password appeared in a leak.
+            Crack-time figures are rough estimates only. Do not paste your real primary password here — try a
+            similar pattern or use the{' '}
+            <Link to="/password-generator" className="underline font-medium">
+              password generator
+            </Link>{' '}
+            to create a new one.
+          </>
+        ),
+      },
+    ],
+    howItWorks:
+      'Strength scoring uses local pattern checks, character variety, and entropy-style estimates in your browser.',
+    limitations:
+      'No breach database lookup. Crack-time and score are approximate — they cannot prove a password was never exposed elsewhere.',
+    privacyNote: 'Passwords you type are analyzed locally and are not sent to SecureTools servers.',
   };
 
   return (
     <ToolLayout
       title="Password Strength Analyzer"
-      description="Analyze password strength, detect common patterns, and provide security recommendations. Comprehensive password security analysis tool that runs entirely in your browser."
+      description="Analyze password patterns, length, and estimated strength locally in your browser. Pattern-based analysis only — no breach database lookup."
     >
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Password Input */}
-        <Card>
+        <Card className="tool-output-highlight">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
@@ -380,7 +418,7 @@ export default function PasswordStrengthAnalyzer() {
                     <div className="text-right text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>Crack time: {analysis.crackTime}</span>
+                        <span>Approx. crack time (estimate): {analysis.crackTime}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Zap className="h-4 w-4" />
@@ -440,33 +478,33 @@ export default function PasswordStrengthAnalyzer() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="flex items-center gap-2">
                         {analysis.patterns.hasSequential ? (
-                          <XCircle className="h-4 w-4 text-red-500" />
+                          <XCircle className="h-4 w-4 text-destructive" />
                         ) : (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                         )}
                         <span>Sequential characters</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {analysis.patterns.hasRepeated ? (
-                          <XCircle className="h-4 w-4 text-red-500" />
+                          <XCircle className="h-4 w-4 text-destructive" />
                         ) : (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                         )}
                         <span>Repeated characters</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {analysis.patterns.hasCommonPattern ? (
-                          <XCircle className="h-4 w-4 text-red-500" />
+                          <XCircle className="h-4 w-4 text-destructive" />
                         ) : (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                         )}
                         <span>Common patterns</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {analysis.patterns.hasKeyboardPattern ? (
-                          <XCircle className="h-4 w-4 text-red-500" />
+                          <XCircle className="h-4 w-4 text-destructive" />
                         ) : (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                         )}
                         <span>Keyboard patterns</span>
                       </div>
@@ -481,7 +519,7 @@ export default function PasswordStrengthAnalyzer() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                        <AlertTriangle className="h-5 w-5 text-warning" />
                         Security Issues
                       </CardTitle>
                     </CardHeader>
@@ -489,7 +527,7 @@ export default function PasswordStrengthAnalyzer() {
                       <ul className="space-y-2">
                         {analysis.issues.map((issue, index) => (
                           <li key={index} className="flex items-start gap-2">
-                            <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                            <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
                             <span>{issue}</span>
                           </li>
                         ))}
@@ -499,7 +537,7 @@ export default function PasswordStrengthAnalyzer() {
                 ) : (
                   <Card>
                     <CardContent className="text-center py-8">
-                      <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                      <CheckCircle className="h-12 w-12 text-success mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">No Issues Found</h3>
                       <p className="text-muted-foreground">
                         Your password doesn't have any obvious security issues.
@@ -515,7 +553,7 @@ export default function PasswordStrengthAnalyzer() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-success" />
                         Recommendations
                       </CardTitle>
                     </CardHeader>
@@ -523,7 +561,7 @@ export default function PasswordStrengthAnalyzer() {
                       <ul className="space-y-2">
                         {analysis.suggestions.map((suggestion, index) => (
                           <li key={index} className="flex items-start gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                             <span>{suggestion}</span>
                           </li>
                         ))}
@@ -533,7 +571,7 @@ export default function PasswordStrengthAnalyzer() {
                 ) : (
                   <Card>
                     <CardContent className="text-center py-8">
-                      <Shield className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                      <Shield className="h-12 w-12 text-success mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">Excellent Password</h3>
                       <p className="text-muted-foreground">
                         Your password follows security best practices.
@@ -546,129 +584,87 @@ export default function PasswordStrengthAnalyzer() {
           </div>
         )}
 
-        {/* Why Use + Key Features */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Why Use Password Strength Analyzer?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Comprehensive Security Analysis</p>
-                  <p className="text-sm text-muted-foreground">Analyze password strength with entropy calculations, crack time estimates, and pattern detection for complete security assessment.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Real-time Feedback</p>
-                  <p className="text-sm text-muted-foreground">Get instant analysis and recommendations as you type, helping you create stronger passwords in real-time.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Pattern Detection</p>
-                  <p className="text-sm text-muted-foreground">Identify common patterns, sequential characters, and weak password structures that could be exploited by attackers.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Educational Insights</p>
-                  <p className="text-sm text-muted-foreground">Learn about password security best practices and understand why certain passwords are stronger than others.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <ToolTrustSection {...toolTrust} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Key Features
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Entropy calculation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Crack time estimation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Pattern detection</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Character analysis</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Security recommendations</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Real-time analysis</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Privacy-focused (all processing in browser)</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Security Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Entropy Analysis</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>Character set analysis:</strong> Calculates possible character combinations</li>
-                  <li>• <strong>Entropy calculation:</strong> Bits of entropy for strength assessment</li>
-                  <li>• <strong>Crack time estimation:</strong> Time to brute force the password</li>
-                  <li>• <strong>Pattern detection:</strong> Identifies common weak patterns</li>
-                  <li>• <strong>Dictionary checking:</strong> Warns about common passwords</li>
-                  <li>• <strong>Length analysis:</strong> Minimum recommended lengths</li>
+        <ToolDetailsAccordion
+          sections={[
+            buildTrustDetailsAccordionSection(toolTrust),
+            {
+              id: 'why-use',
+              title: 'Why use this tool',
+              content: (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Local pattern analysis</p>
+                      <p>Analyze length, character variety, common patterns, and approximate entropy — not breach intelligence.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Real-time feedback</p>
+                      <p>Get instant analysis and suggestions as you type.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Pattern detection</p>
+                      <p>Identify sequential characters, keyboard patterns, and common weak structures.</p>
+                    </div>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              id: 'key-features',
+              title: 'Key features',
+              content: (
+                <ul className="space-y-2 list-disc pl-5">
+                  <li>Entropy calculation</li>
+                  <li>Approximate crack-time estimate</li>
+                  <li>Pattern detection</li>
+                  <li>Character analysis</li>
+                  <li>Security recommendations</li>
+                  <li>Real-time analysis</li>
+                  <li>Privacy-focused — all processing in browser</li>
                 </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Security Checks</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>Character variety:</strong> Uppercase, lowercase, numbers, symbols</li>
-                  <li>• <strong>Pattern analysis:</strong> Sequential, repeated, keyboard patterns</li>
-                  <li>• <strong>Common password detection:</strong> Known weak passwords</li>
-                  <li>• <strong>Personal info check:</strong> Warns about personal data</li>
-                  <li>• <strong>Length requirements:</strong> Minimum 8-12 characters</li>
-                  <li>• <strong>Privacy-focused:</strong> All analysis in browser</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Badge variant="secondary">Entropy Analysis</Badge>
-              <Badge variant="secondary">Pattern Detection</Badge>
-              <Badge variant="secondary">Crack Time</Badge>
-              <Badge variant="secondary">Privacy Focused</Badge>
-            </div>
-          </CardContent>
-        </Card>
+              ),
+            },
+            {
+              id: 'security-info',
+              title: 'Security information',
+              content: (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Entropy analysis</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li><strong>Character set analysis:</strong> Calculates possible character combinations</li>
+                      <li><strong>Entropy calculation:</strong> Bits of entropy for strength assessment</li>
+                      <li><strong>Crack time estimation:</strong> Rough brute-force estimate only</li>
+                      <li><strong>Common password list:</strong> Small local list — not a breach database</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Security checks</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li>Character variety: uppercase, lowercase, numbers, symbols</li>
+                      <li>Pattern analysis: sequential, repeated, keyboard patterns</li>
+                      <li>All analysis runs locally in your browser</li>
+                    </ul>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">Pattern only</Badge>
+                    <Badge variant="secondary">No breach DB</Badge>
+                    <Badge variant="secondary">Approx. Estimates</Badge>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
       </div>
     </ToolLayout>
   );

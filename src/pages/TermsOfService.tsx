@@ -10,8 +10,8 @@ import { useSEO } from '@/hooks/useSEO';
 export const TermsOfService = () => {
   useSEO({
     title: 'Terms of Service - SecureTools Security Tools | Usage Terms & Conditions',
-    description: 'Simple, clear, and user-friendly terms for using SecureTools. Free online security tools with military-grade encryption and transparent usage terms and conditions.',
-    keywords: 'terms of service, usage terms, terms and conditions, security tools, free security tools, legal terms, user agreement, military-grade encryption',
+    description: 'Simple, clear, and user-friendly terms for using SecureTools. Free online security tools with local browser processing and transparent usage terms and conditions.',
+    keywords: 'terms of service, usage terms, terms and conditions, security tools, free security tools, legal terms, user agreement, browser-based security',
     canonical: 'https://www.securetools.dev/terms',
     structuredData: {
       '@context': 'https://schema.org',
@@ -32,7 +32,7 @@ export const TermsOfService = () => {
   return (
     <ToolLayout
       title="Terms of Service"
-      description="Simple, clear, and user-friendly terms for using SecureTools security tools with military-grade encryption."
+      description="Simple, clear, and user-friendly terms for using SecureTools security tools."
     >
       <div className="p-6 max-w-4xl mx-auto">
         <div className="prose prose-gray dark:prose-invert max-w-none">
@@ -54,12 +54,12 @@ export const TermsOfService = () => {
               SecureTools provides free online security and utility tools including:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mb-6">
-              <li>Password & Passphrase Generator - Generate cryptographically secure passwords and memorable passphrases</li>
-              <li>Timezone Converter - Convert times across timezones with meeting finder and date calculations</li>
-              <li>Financial Calculator - Calculate loans, EMI, compound interest, and retirement planning</li>
-              <li>Text Readability Analyzer - Analyze text readability with Flesch scores and writing suggestions</li>
-              <li>Username Generator - Generate memorable usernames with adjective+animal+number combinations</li>
-              <li>QR & Barcode Generator - Generate QR codes and barcodes with customization and multiple formats</li>
+              <li>Password &amp; Passphrase Generator — secure passwords and Diceware passphrases</li>
+              <li>Text Encryptor/Decryptor — AES-256-GCM plus Base64, URL, and ROT13 utilities</li>
+              <li>Security Headers Checker (demo) — educational header examples, not live remote scanning</li>
+              <li>Two-Factor Authentication Generator — RFC 6238 TOTP codes and otpauth QR setup</li>
+              <li>Random Data Generator — secure random strings, tokens, and UUIDs</li>
+              <li>Password Strength Analyzer — local entropy and pattern analysis (no breach database)</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed">
               All tools process data locally in your browser and do not send data to our servers.
@@ -97,9 +97,9 @@ export const TermsOfService = () => {
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-foreground mb-4">Privacy and Data</h2>
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
-              <h3 className="font-semibold text-green-700 dark:text-green-300 mb-2">🔒 Local Processing</h3>
-              <p className="text-green-600 dark:text-green-400 text-sm">
+            <div className="rounded-lg border surface-success p-4 mb-4">
+              <h3 className="font-semibold text-success mb-2">🔒 Local Processing</h3>
+              <p className="text-success/90 text-sm">
                 All data processing happens locally in your browser. We do not collect, store, 
                 or have access to your sensitive data.
               </p>
@@ -197,9 +197,9 @@ export const TermsOfService = () => {
             </div>
           </section>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-8">
-            <h3 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🤝 User-Friendly Terms</h3>
-            <p className="text-blue-600 dark:text-blue-400 text-sm">
+          <div className="rounded-lg border surface-info p-4 mt-8">
+            <h3 className="font-semibold text-info mb-2">🤝 User-Friendly Terms</h3>
+            <p className="text-info/90 text-sm">
               These terms are designed to be clear and fair to users. We believe in 
               open source, privacy, and supporting the security and utility tools community.
             </p>

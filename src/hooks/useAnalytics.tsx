@@ -26,10 +26,7 @@ export const useAnalytics = () => {
       const measurementId = getGoogleAnalyticsId();
       if (measurementId) {
         initializeAnalytics(measurementId);
-        console.log('✅ Google Analytics initialized with ID:', measurementId);
       }
-    } else {
-      console.log('⚠️ Google Analytics not configured. Update src/config/analytics.ts with your Measurement ID');
     }
   }, []);
 

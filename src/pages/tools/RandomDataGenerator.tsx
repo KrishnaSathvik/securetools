@@ -25,8 +25,11 @@ import {
   Target,
   Zap
 } from 'lucide-react';
+import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
+import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
 
 interface GenerationOptions {
   length: number;
@@ -38,6 +41,15 @@ interface GenerationOptions {
   excludeAmbiguous: boolean;
   customChars: string;
 }
+
+const CHAR_SETS = {
+  uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  lowercase: 'abcdefghijklmnopqrstuvwxyz',
+  numbers: '0123456789',
+  symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?',
+  similar: 'il1Lo0O',
+  ambiguous: '{}[]()/\\\'"`~,;.<>',
+};
 
 export default function RandomDataGenerator() {
   const [output, setOutput] = useState('');
@@ -59,18 +71,13 @@ export default function RandomDataGenerator() {
     title: 'Random Data Generator - Secure Random Strings & Tokens | SecureTools',
     description: 'Generate secure random strings, API keys, tokens, UUIDs, and cryptographic data. Cryptographically secure random data generator that runs entirely in your browser.',
     keywords: 'random data generator, secure random strings, API key generator, token generator, UUID generator, cryptographic random, security tools',
-    canonical: 'https://www.securetools.dev/random-data-generator'
+    canonical: 'https://www.securetools.dev/random-data-generator',
+    structuredData: buildWebApplicationSchema({
+      name: 'Random Data Generator',
+      description: 'Generate secure random strings, tokens, and UUIDs in your browser.',
+      path: '/random-data-generator',
+    }),
   });
-
-  // Character sets
-  const charSets = {
-    uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    lowercase: 'abcdefghijklmnopqrstuvwxyz',
-    numbers: '0123456789',
-    symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?',
-    similar: 'il1Lo0O', // Characters that look similar
-    ambiguous: '{}[]()/\\\'"`~,;.<>' // Ambiguous characters
-  };
 
   // Generate random string
   const generateRandomString = useCallback((options: GenerationOptions, length: number): string => {
@@ -79,17 +86,17 @@ export default function RandomDataGenerator() {
     if (options.customChars) {
       charset = options.customChars;
     } else {
-      if (options.includeUppercase) charset += charSets.uppercase;
-      if (options.includeLowercase) charset += charSets.lowercase;
-      if (options.includeNumbers) charset += charSets.numbers;
-      if (options.includeSymbols) charset += charSets.symbols;
+      if (options.includeUppercase) charset += CHAR_SETS.uppercase;
+      if (options.includeLowercase) charset += CHAR_SETS.lowercase;
+      if (options.includeNumbers) charset += CHAR_SETS.numbers;
+      if (options.includeSymbols) charset += CHAR_SETS.symbols;
       
       if (options.excludeSimilar) {
-        charset = charset.split('').filter(char => !charSets.similar.includes(char)).join('');
+        charset = charset.split('').filter(char => !CHAR_SETS.similar.includes(char)).join('');
       }
       
       if (options.excludeAmbiguous) {
-        charset = charset.split('').filter(char => !charSets.ambiguous.includes(char)).join('');
+        charset = charset.split('').filter(char => !CHAR_SETS.ambiguous.includes(char)).join('');
       }
     }
 
@@ -231,14 +238,38 @@ export default function RandomDataGenerator() {
     });
   };
 
+  const toolTrust = {
+    badges: [
+      { label: 'CSPRNG', variant: 'csprng' as const },
+      { label: 'Local', variant: 'local' as const },
+      { label: 'Dev/Test', variant: 'dev-test' as const },
+    ],
+    callouts: [
+      {
+        variant: 'warning' as const,
+        content: (
+          <>
+            <strong>Use responsibly:</strong> Generated values suit testing, placeholders, and development workflows.
+            For production secrets, use your infrastructure&apos;s approved secret-management process.
+          </>
+        ),
+      },
+    ],
+    howItWorks:
+      'Random strings, UUIDs, bytes, and numbers are generated locally using the Web Crypto API for cryptographically secure randomness.',
+    limitations:
+      'Do not treat generated tokens as a replacement for production secret management. Avoid using random test data as real user data or live credentials.',
+    privacyNote: 'Generated values are not sent to SecureTools servers.',
+  };
+
   return (
     <ToolLayout
       title="Random Data Generator"
-      description="Generate secure random strings, API keys, tokens, UUIDs, and cryptographic data. Cryptographically secure random data generator that runs entirely in your browser."
+      description="Generate token-like random strings for development, testing, examples, and placeholders. CSPRNG-backed random data in your browser."
     >
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Generation Options */}
-        <Card>
+        <Card className="tool-workspace">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shuffle className="h-5 w-5" />
@@ -458,129 +489,87 @@ export default function RandomDataGenerator() {
           </Button>
         </div>
 
-        {/* Why Use + Key Features */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Why Use Random Data Generator?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Cryptographically Secure Data</p>
-                  <p className="text-sm text-muted-foreground">Generate truly random strings, UUIDs, and cryptographic data using Web Crypto API for maximum security.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Multiple Data Types</p>
-                  <p className="text-sm text-muted-foreground">Generate random strings, UUIDs, bytes, integers, and floats for various development and security needs.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">API Keys & Tokens</p>
-                  <p className="text-sm text-muted-foreground">Create secure API keys, authentication tokens, and session IDs for your applications and services.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Customizable Options</p>
-                  <p className="text-sm text-muted-foreground">Control character sets, length, and filtering options to generate data that meets your specific requirements.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <ToolTrustSection {...toolTrust} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Key Features
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Web Crypto API integration</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Random strings generation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">UUID v4 generation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Random bytes (hex format)</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Random integers and floats</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Custom character filtering</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Privacy-focused (all processing in browser)</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Security Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Cryptographic Security</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>Web Crypto API:</strong> Cryptographically secure randomness</li>
-                  <li>• <strong>CSPRNG:</strong> Cryptographically secure pseudo-random number generator</li>
-                  <li>• <strong>Hardware entropy:</strong> Uses system entropy sources</li>
-                  <li>• <strong>Unpredictable output:</strong> Suitable for security applications</li>
-                  <li>• <strong>No patterns:</strong> Truly random data generation</li>
-                  <li>• <strong>Military-grade:</strong> Meets security standards</li>
+        <ToolDetailsAccordion
+          sections={[
+            buildTrustDetailsAccordionSection(toolTrust),
+            {
+              id: 'why-use',
+              title: 'Why use this tool',
+              content: (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">CSPRNG-backed output</p>
+                      <p>Generate random strings, UUIDs, and bytes using Web Crypto API randomness.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Multiple data types</p>
+                      <p>Strings, UUIDs, bytes, integers, and floats for development workflows.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Token-like strings</p>
+                      <p>Generate token-like random strings for development, testing, examples, and placeholders.</p>
+                    </div>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              id: 'key-features',
+              title: 'Key features',
+              content: (
+                <ul className="space-y-2 list-disc pl-5">
+                  <li>Web Crypto API integration</li>
+                  <li>Random strings generation</li>
+                  <li>UUID v4 generation</li>
+                  <li>Random bytes (hex format)</li>
+                  <li>Random integers and floats</li>
+                  <li>Custom character filtering</li>
+                  <li>Privacy-focused — all processing in browser</li>
                 </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Data Types Generated</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>UUIDs:</strong> Universally unique identifiers (v4)</li>
-                  <li>• <strong>Random strings:</strong> Customizable length and character sets</li>
-                  <li>• <strong>Random bytes:</strong> Hex-encoded binary data</li>
-                  <li>• <strong>Random numbers:</strong> Integers and floating-point values</li>
-                  <li>• <strong>API keys:</strong> Secure token generation</li>
-                  <li>• <strong>Passwords:</strong> High-entropy random passwords</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Badge variant="secondary">Web Crypto API</Badge>
-              <Badge variant="secondary">CSPRNG</Badge>
-              <Badge variant="secondary">UUID v4</Badge>
-              <Badge variant="secondary">Privacy Focused</Badge>
-            </div>
-          </CardContent>
-        </Card>
+              ),
+            },
+            {
+              id: 'security-info',
+              title: 'Security information',
+              content: (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Cryptographic security</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li><strong>Web Crypto API:</strong> Cryptographically secure randomness</li>
+                      <li><strong>CSPRNG:</strong> Browser-backed secure random generation</li>
+                      <li><strong>Unpredictable output:</strong> Suitable for dev/test samples when used responsibly</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Data types generated</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li><strong>UUIDs:</strong> Universally unique identifiers (v4)</li>
+                      <li><strong>Random strings:</strong> Customizable length and character sets</li>
+                      <li><strong>Token-like strings:</strong> For examples and placeholders — not production secret management</li>
+                    </ul>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">Web Crypto API</Badge>
+                    <Badge variant="secondary">CSPRNG</Badge>
+                    <Badge variant="secondary">UUID v4</Badge>
+                    <Badge variant="secondary">Dev/Test</Badge>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
       </div>
     </ToolLayout>
   );

@@ -11,7 +11,7 @@ import { useSEO } from '@/hooks/useSEO';
 export const About = () => {
   useSEO({
     title: 'About SecureTools - Professional Security Tools | Free Online Security Utilities',
-    description: 'Learn about SecureTools - the professional security tools platform built for developers, security professionals, and privacy-conscious users. Military-grade encryption, local processing, completely free, and runs entirely in your browser.',
+    description: 'Learn about SecureTools - the security tools platform built for developers, security professionals, and privacy-conscious users. Local browser processing, industry-standard cryptography, completely free, and runs entirely in your browser.',
     keywords: 'about securetools, security tools, password generator, text encryptor, security headers checker, 2FA generator, random data generator, password analyzer, privacy-focused, free security tools, browser-based security',
     canonical: 'https://www.securetools.dev/about',
     structuredData: {
@@ -41,7 +41,7 @@ export const About = () => {
               About SecureTools
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Learn about SecureTools - the professional security tools platform built for developers, security professionals, and privacy-conscious users. Military-grade encryption, local processing, and completely free.
+              Learn about SecureTools - security tools built for developers, security professionals, and privacy-conscious users. Local browser processing, honest limitations, and completely free.
             </p>
           </div>
         </div>
@@ -58,9 +58,9 @@ export const About = () => {
                 alt="SecureTools Logo" 
                 className="w-16 h-16 mx-auto mb-4"
               />
-              <h1 className="text-4xl font-bold text-foreground mb-4">SecureTools</h1>
+              <h2 className="text-4xl font-bold text-foreground mb-4">SecureTools</h2>
               <p className="text-xl text-muted-foreground">
-                Professional security tools built for the modern web with military-grade encryption
+                Security tools built for the modern web with local browser processing and modern cryptographic APIs
               </p>
             </div>
           </section>
@@ -71,14 +71,14 @@ export const About = () => {
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               SecureTools was born from a simple idea: developers and security professionals deserve fast, reliable, and 
               privacy-focused security tools that work seamlessly in their browser. We believe that 
-              your sensitive data should stay on your device, and your security tools should use military-grade encryption.
+              your sensitive data should stay on your device, and your security tools should use industry-standard cryptography where encryption applies.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-card border border-border rounded-lg p-6 text-center">
                 <Shield className="w-8 h-8 text-success mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-2">Security First</h3>
                 <p className="text-sm text-muted-foreground">
-                  All processing happens locally in your browser with military-grade encryption. Your sensitive data never leaves your device.
+                  All processing happens locally in your browser. Your sensitive data never leaves your device.
                 </p>
               </div>
               <div className="bg-card border border-border rounded-lg p-6 text-center">
@@ -90,7 +90,7 @@ export const About = () => {
               </div>
               <div className="bg-card border border-border rounded-lg p-6 text-center">
                 <Heart className="w-8 h-8 text-danger mx-auto mb-3" />
-                <h3 className="font-semibold text-foreground mb-2">Professional Love</h3>
+                <h3 className="font-semibold text-foreground mb-2">Built for practitioners</h3>
                 <p className="text-sm text-muted-foreground">
                   Built by security professionals, for security professionals. We understand your security needs.
                 </p>
@@ -114,7 +114,7 @@ export const About = () => {
               </p>
               <p>
                 So we built SecureTools - a collection of essential security tools that process 
-                everything locally in your browser with military-grade encryption. No data leaves your device, no accounts required, 
+                everything locally in your browser. No data leaves your device, no accounts required, 
                 and no compromises on speed, security, or functionality.
               </p>
             </div>
@@ -127,7 +127,7 @@ export const About = () => {
               <div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">🔒 Privacy by Design</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Unlike other online tools, SecureTools processes all data locally in your browser with military-grade encryption. 
+                  Unlike other online tools, SecureTools processes all data locally in your browser. 
                   Your passwords, encrypted data, and other sensitive information never leaves your device.
                 </p>
                 <ul className="list-disc list-inside text-muted-foreground space-y-2">
@@ -158,13 +158,13 @@ export const About = () => {
             <h2 className="text-3xl font-bold text-foreground mb-6">Our Tools</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
               SecureTools includes six essential security tools, each designed to solve 
-              common security problems quickly and securely with military-grade encryption:
+              common security problems quickly and securely:
             </p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { name: 'Password & Passphrase Generator', desc: 'Generate cryptographically secure passwords and memorable passphrases with entropy analysis' },
                 { name: 'Text Encryptor/Decryptor', desc: 'Encrypt and decrypt text with AES-256 encryption and password-based security' },
-                { name: 'Security Headers Checker', desc: 'Analyze website security headers, SSL/TLS certificates, and vulnerability assessment' },
+                { name: 'Security Headers Checker (Demo)', desc: 'Educational demo for common HTTP security headers — not live remote scanning' },
                 { name: 'Two-Factor Authentication Generator', desc: 'Generate TOTP codes, QR codes for authenticator apps, and backup codes' },
                 { name: 'Random Data Generator', desc: 'Generate secure random strings, API keys, tokens, and cryptographic data' },
                 { name: 'Password Strength Analyzer', desc: 'Analyze password strength, detect common patterns, and provide security recommendations' }
@@ -198,7 +198,7 @@ export const About = () => {
               <div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">Security & Tools</h3>
                 <ul className="bullet-list text-muted-foreground">
-                  <li><strong>Web Crypto API</strong> - Military-grade cryptographic operations</li>
+                  <li><strong>Web Crypto API</strong> - Industry-standard cryptographic operations</li>
                   <li><strong>AES-256-GCM</strong> - Advanced encryption standard</li>
                   <li><strong>PBKDF2</strong> - Password-based key derivation</li>
                   <li><strong>Vitest</strong> - Fast unit testing</li>
@@ -260,7 +260,7 @@ export const About = () => {
               <h2 className="text-2xl font-bold text-foreground mb-4">Ready to Get Started?</h2>
               <p className="text-muted-foreground mb-6">
                 Try SecureTools today and experience the difference that privacy-focused, 
-                high-performance security tools with military-grade encryption can make.
+                high-performance security tools with honest, local processing can make.
               </p>
               <a 
                 href="/" 

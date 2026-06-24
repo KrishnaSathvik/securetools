@@ -31,13 +31,21 @@
   }
 }
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
+
+SecureTools token map (use these — avoid raw emerald/sky/amber/green classes):
+  Brand:     primary, ring, text-link, bg-primary, border-primary/30
+  Trust:     success, bg-success/15, text-success
+  Technical: info, bg-info/15, text-info
+  Caution:   warning, bg-warning/15, text-warning
+  Neutral:   muted, secondary, border, card
+  Danger:    destructive
 */
 
 @layer base {
   :root {
-    /* Professional dark theme - Discord/VS Code inspired */
+    /* SecureTools dark — charcoal surfaces + emerald trust accent */
     --background: 220 13% 9%;
     --foreground: 220 9% 96%;
     
@@ -47,8 +55,8 @@ All colors MUST be HSL.
     --popover: 220 13% 11%;
     --popover-foreground: 220 9% 96%;
     
-    --primary: 262 83% 58%;
-    --primary-foreground: 220 9% 96%;
+    --primary: 160 64% 42%;
+    --primary-foreground: 0 0% 100%;
     
     --secondary: 220 13% 14%;
     --secondary-foreground: 220 9% 88%;
@@ -56,7 +64,7 @@ All colors MUST be HSL.
     --muted: 220 13% 14%;
     --muted-foreground: 220 9% 65%;
     
-    --accent: 262 83% 58%;
+    --accent: 220 13% 16%;
     --accent-foreground: 220 9% 96%;
     
     --destructive: 0 84% 60%;
@@ -64,21 +72,26 @@ All colors MUST be HSL.
     
     --border: 220 13% 18%;
     --input: 220 13% 14%;
-    --ring: 262 83% 58%;
+    --ring: 160 64% 42%;
     
     --radius: 0.5rem;
+    
+    /* Links — slightly brighter than primary on dark backgrounds */
+    --link: 160 58% 52%;
+    --link-hover: 160 62% 62%;
     
     /* App specific colors */
     --app-background: 220 13% 8%;
     --nav-background: 220 13% 10%;
     --editor-background: 220 13% 12%;
     
-    --success: 142 71% 45%;
-    --success-foreground: 220 9% 96%;
-    --warning: 38 92% 50%;
+    /* Semantic status */
+    --success: 152 60% 48%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 90% 52%;
     --warning-foreground: 220 13% 9%;
-    --info: 217 91% 60%;
-    --info-foreground: 220 9% 96%;
+    --info: 199 80% 55%;
+    --info-foreground: 220 13% 9%;
     
     /* Tool-specific colors */
     --tool-bg: 220 13% 6%;
@@ -89,12 +102,15 @@ All colors MUST be HSL.
     --hover-bg: 220 13% 18%;
     --active-bg: 220 13% 22%;
     
-    /* Beautiful gradient */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(292 84% 61%));
+    /* Brand gradient */
+    --gradient-start: 160 64% 42%;
+    --gradient-end: 172 58% 38%;
+    --gradient-accent: 152 60% 48%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
   }
   
   .light {
-    /* Light theme - all values in HSL format */
+    /* SecureTools light */
     --background: 0 0% 100%;
     --foreground: 224 71% 4%;
     
@@ -104,7 +120,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 224 71% 4%;
     
-    --primary: 262 83% 58%;
+    --primary: 160 72% 30%;
     --primary-foreground: 0 0% 100%;
     
     --secondary: 220 14% 96%;
@@ -113,26 +129,29 @@ All colors MUST be HSL.
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
     
-    --accent: 262 83% 58%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 224 71% 4%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 262 83% 58%;
+    --ring: 160 72% 30%;
+    
+    --link: 160 72% 28%;
+    --link-hover: 160 72% 22%;
     
     /* App specific colors */
     --app-background: 0 0% 100%;
     --nav-background: 0 0% 100%;
     --editor-background: 220 14% 96%;
     
-    --success: 142 71% 45%;
+    --success: 152 60% 32%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 38 88% 40%;
     --warning-foreground: 224 71% 4%;
-    --info: 217 91% 60%;
+    --info: 199 75% 38%;
     --info-foreground: 0 0% 100%;
     
     /* Tool-specific colors for light theme */
@@ -143,6 +162,11 @@ All colors MUST be HSL.
     /* Interactive states for light theme */
     --hover-bg: 220 14% 96%;
     --active-bg: 220 14% 92%;
+    
+    --gradient-start: 160 72% 30%;
+    --gradient-end: 172 65% 28%;
+    --gradient-accent: 152 60% 32%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
   }
 }
 
@@ -225,6 +249,80 @@ All colors MUST be HSL.
     font-weight: 600;
   }
 
+  /* Semantic utilities — prefer these over raw Tailwind color names */
+  .text-link {
+    color: hsl(var(--link));
+  }
+
+  .text-link:hover,
+  .hover\:text-link-hover:hover {
+    color: hsl(var(--link-hover));
+  }
+
+  .surface-brand {
+    border-color: hsl(var(--primary) / 0.25);
+    background-color: hsl(var(--primary) / 0.06);
+  }
+
+  .surface-success {
+    border-color: hsl(var(--success) / 0.3);
+    background-color: hsl(var(--success) / 0.1);
+  }
+
+  .surface-info {
+    border-color: hsl(var(--info) / 0.3);
+    background-color: hsl(var(--info) / 0.06);
+  }
+
+  .surface-warning {
+    border-color: hsl(var(--warning) / 0.35);
+    background-color: hsl(var(--warning) / 0.1);
+  }
+
+  .badge-tone-success {
+    @apply bg-success/15 text-success border border-success/30;
+  }
+
+  .badge-tone-info {
+    @apply bg-info/15 text-info border border-info/30;
+  }
+
+  .badge-tone-warning {
+    @apply bg-warning/15 text-warning border border-warning/35;
+  }
+
+  .badge-tone-neutral {
+    @apply bg-secondary text-secondary-foreground border border-border;
+  }
+
+  .hover-card-brand {
+    @apply transition-colors hover:border-primary/30;
+  }
+
+  .icon-brand {
+    @apply text-primary;
+  }
+
+  .icon-success {
+    @apply text-success;
+  }
+
+  .icon-info {
+    @apply text-info;
+  }
+
+  .icon-warning {
+    @apply text-warning;
+  }
+
+  .callout-info {
+    @apply border-l-[3px] border-l-info bg-info/[0.07] text-foreground/90;
+  }
+
+  .callout-warning {
+    @apply border-l-[3px] border-l-warning bg-warning/[0.07] text-foreground/90;
+  }
+
   .bullet-list {
     list-style: none;
     padding-left: 0;
@@ -269,5 +367,227 @@ All colors MUST be HSL.
   
   .border-tool-border {
     border-color: hsl(var(--tool-border));
+  }
+
+  /* Homepage layout — ByteToolBox-inspired sections */
+  .home-hero {
+    @apply pt-14 pb-12 sm:pt-16 sm:pb-14;
+  }
+
+  .home-section {
+    @apply pb-14 sm:pb-16;
+  }
+
+  .home-why {
+    @apply border-t border-border pt-14 sm:pt-16;
+  }
+
+  .home-tool-card {
+    @apply bg-card border border-border rounded-lg p-4 sm:p-5 hover-card-brand;
+  }
+
+  .home-tool-badge {
+    @apply text-[10px] font-semibold uppercase tracking-wider text-muted-foreground;
+  }
+
+  .home-guide-card {
+    @apply bg-card border border-border rounded-lg p-4 sm:p-5 hover-card-brand;
+  }
+
+  .home-guide-tag {
+    @apply inline-block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border border-border rounded px-2 py-0.5;
+  }
+
+  /* Trust strip badges on homepage */
+  .trust-badge {
+    @apply inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium;
+    border-color: hsl(var(--border));
+    background-color: hsl(var(--card));
+    color: hsl(var(--muted-foreground));
+  }
+
+  .trust-badge-local {
+    border-color: hsl(var(--success) / 0.35);
+    background-color: hsl(var(--success) / 0.08);
+    color: hsl(var(--success));
+  }
+
+  .trust-badge-demo {
+    border-color: hsl(var(--warning) / 0.4);
+    background-color: hsl(var(--warning) / 0.1);
+    color: hsl(var(--warning));
+  }
+
+  /* Tool workspace — primary interaction area */
+  .tool-workspace {
+    @apply border-2 border-border bg-card shadow-sm;
+  }
+
+  .tool-output-highlight {
+    @apply border-2 border-primary/30 bg-primary/5;
+  }
+
+  .tool-trust-section {
+    @apply rounded-xl border border-border/70 bg-card/40 px-4 py-4 sm:px-5 sm:py-5 space-y-4;
+  }
+
+  .tool-trust-details {
+    @apply rounded-lg bg-muted/20 px-3 py-4 sm:px-4 border border-border/50;
+  }
+
+  .tool-trust-details > .grid > div {
+    @apply md:px-4 first:md:pl-0 last:md:pr-0;
+  }
+
+  /* Blog article prose */
+  .blog-prose {
+    @apply text-foreground leading-relaxed;
+  }
+
+  .blog-prose h2 {
+    @apply text-2xl font-semibold mt-10 mb-4 text-foreground scroll-mt-20;
+  }
+
+  .blog-prose h3 {
+    @apply text-xl font-semibold mt-8 mb-3 text-foreground scroll-mt-20;
+  }
+
+  .blog-prose h4 {
+    @apply text-lg font-semibold mt-6 mb-2 text-foreground;
+  }
+
+  .blog-prose p {
+    @apply mb-5 text-muted-foreground leading-7;
+  }
+
+  .blog-prose ul,
+  .blog-prose ol {
+    @apply mb-5 ml-6 space-y-2 text-muted-foreground;
+  }
+
+  .blog-prose ul {
+    @apply list-disc;
+  }
+
+  .blog-prose ol {
+    @apply list-decimal;
+  }
+
+  .blog-prose li {
+    @apply leading-7;
+  }
+
+  .blog-prose a {
+    @apply text-link underline underline-offset-2 hover:text-link-hover;
+  }
+
+  .blog-prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .blog-prose hr {
+    @apply my-10 border-border;
+  }
+
+  .blog-prose blockquote {
+    @apply my-6 border-l-4 border-primary/40 pl-4 italic text-muted-foreground;
+  }
+
+  .blog-prose code:not(pre code) {
+    @apply rounded bg-code-background px-1.5 py-0.5 text-sm font-mono text-success;
+  }
+
+  .blog-prose pre {
+    @apply my-6 overflow-x-auto rounded-lg border border-border bg-code-background p-4 text-sm;
+  }
+
+  .blog-prose pre code {
+    @apply bg-transparent p-0 text-foreground;
+  }
+
+  .blog-callout {
+    @apply my-6 rounded-lg border p-4 sm:p-5;
+  }
+
+  .blog-callout-answer {
+    @apply blog-callout border-info/30 bg-info/5;
+  }
+
+  .blog-callout-takeaways {
+    @apply blog-callout border-primary/30 bg-primary/5;
+  }
+
+  .blog-callout-prose p:last-child,
+  .blog-callout-prose ul:last-child,
+  .blog-callout-prose ol:last-child {
+    @apply mb-0;
+  }
+
+  .blog-callout-prose p,
+  .blog-callout-prose ul,
+  .blog-callout-prose ol {
+    @apply text-muted-foreground;
+  }
+
+  .blog-callout-prose ul {
+    @apply list-disc ml-6 space-y-1;
+  }
+
+  .blog-callout-prose ol {
+    @apply list-decimal ml-6 space-y-1;
+  }
+
+  .blog-callout-prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .blog-prose .blog-table-wrap {
+    @apply my-6 overflow-x-auto rounded-lg border border-border bg-card;
+  }
+
+  .blog-prose table {
+    @apply w-full min-w-[28rem] border-collapse text-sm;
+  }
+
+  .blog-prose thead {
+    @apply bg-muted/40;
+  }
+
+  .blog-prose th {
+    @apply px-4 py-3 text-left font-semibold text-foreground border-b border-border whitespace-nowrap;
+  }
+
+  .blog-prose td {
+    @apply px-4 py-3 text-muted-foreground border-b border-border align-top leading-6;
+  }
+
+  .blog-prose tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .blog-prose tbody tr:hover {
+    @apply bg-muted/20;
+  }
+
+  .blog-prose td a,
+  .blog-prose th a {
+    @apply text-link underline underline-offset-2 hover:text-link-hover;
+  }
+
+  .blog-tool-cta {
+    @apply rounded-lg surface-brand p-5 sm:p-6;
+  }
+
+  .blog-tool-cta-label {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-primary mb-2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-prose *,
+    [data-state] {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

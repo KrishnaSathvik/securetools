@@ -19,11 +19,23 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
+  AlertTriangle,
   Target,
   Zap
 } from 'lucide-react';
+import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
+import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
+import {
+  generateTotpSecret,
+  generateTotpCode,
+  buildOtpAuthUri,
+  getTotpTimeRemaining,
+  generateBackupCodes,
+} from '@/lib/totp';
+import QRCode from 'react-qr-code';
 
 interface TOTPCode {
   code: string;
@@ -44,53 +56,35 @@ export default function TwoFactorAuth() {
 
   useSEO({
     title: 'Two-Factor Authentication Generator - TOTP & QR Code Tool | SecureTools',
-    description: 'Generate TOTP codes, QR codes for authenticator apps, and backup codes. Secure 2FA setup tool that runs entirely in your browser.',
-    keywords: '2FA generator, TOTP generator, QR code generator, authenticator app, two factor authentication, backup codes, security',
-    canonical: 'https://www.securetools.dev/two-factor-auth'
+    description:
+      'Generate RFC 6238 TOTP codes, scannable otpauth QR codes, and backup codes locally in your browser.',
+    keywords: '2FA generator, TOTP generator, QR code, authenticator app, two factor authentication, backup codes, security',
+    canonical: 'https://www.securetools.dev/two-factor-auth',
+    structuredData: buildWebApplicationSchema({
+      name: 'Two-Factor Authentication Generator',
+      description: 'Browser-based RFC 6238 TOTP and QR setup helper.',
+      path: '/two-factor-auth',
+    }),
   });
 
-  // Generate a random base32 secret
   const generateSecret = useCallback(() => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-    let result = '';
-    for (let i = 0; i < 32; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setSecret(result);
+    setSecret(generateTotpSecret());
   }, []);
 
-  // Generate TOTP code
-  const generateTOTP = useCallback((secret: string, timestamp: number = Date.now()) => {
+  const generateTOTP = useCallback((secretKey: string) => {
     try {
-      // This is a simplified TOTP implementation
-      // In a real implementation, you'd use a proper TOTP library
-      const timeStep = Math.floor(timestamp / 30000); // 30-second window
-      const hash = btoa(secret + timeStep.toString());
-      const code = Math.abs(hash.split('').reduce((a, b) => {
-        a = ((a << 5) - a) + b.charCodeAt(0);
-        return a & a;
-      }, 0)) % 1000000;
-      
-      return code.toString().padStart(6, '0');
-    } catch (error) {
+      return generateTotpCode(secretKey);
+    } catch {
       return '000000';
     }
   }, []);
 
-  // Generate backup codes
-  const generateBackupCodes = useCallback(() => {
-    const codes = [];
-    for (let i = 0; i < 10; i++) {
-      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-      codes.push(code);
-    }
-    setBackupCodes(codes);
+  const generateBackupCodesList = useCallback(() => {
+    setBackupCodes(generateBackupCodes());
   }, []);
 
-  // Generate QR code data
-  const generateQRCodeData = useCallback((secret: string, issuer: string, account: string) => {
-    const otpauth = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(account)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
-    return otpauth;
+  const generateQRCodeData = useCallback((secretKey: string, issuerName: string, accountName: string) => {
+    return buildOtpAuthUri(secretKey, issuerName, accountName);
   }, []);
 
   // Update TOTP code every second
@@ -100,10 +94,10 @@ export default function TwoFactorAuth() {
     const updateCode = () => {
       const now = Date.now();
       const period = 30;
-      const timeLeft = period - Math.floor((now / 1000) % period);
+      const timeLeft = getTotpTimeRemaining(now);
       
       setTotpCode({
-        code: generateTOTP(secret, now),
+        code: generateTOTP(secret),
         timeLeft,
         period
       });
@@ -121,9 +115,9 @@ export default function TwoFactorAuth() {
       generateSecret();
     }
     if (backupCodes.length === 0) {
-      generateBackupCodes();
+      generateBackupCodesList();
     }
-  }, [secret, generateSecret, backupCodes.length, generateBackupCodes]);
+  }, [secret, generateSecret, backupCodes.length, generateBackupCodesList]);
 
   // Update QR code data when secret, issuer, or account changes
   useEffect(() => {
@@ -175,21 +169,49 @@ export default function TwoFactorAuth() {
   };
 
   const handleRegenerateBackupCodes = () => {
-    generateBackupCodes();
+    generateBackupCodesList();
     toast({
       title: 'Backup codes regenerated',
       description: 'New backup codes have been generated',
     });
   };
 
+  const toolTrust = {
+    badges: [
+      { label: 'TOTP', variant: 'totp' as const },
+      { label: 'Local', variant: 'local' as const },
+    ],
+    callouts: [
+      {
+        variant: 'info' as const,
+        content:
+          "This tool helps you set up or test TOTP locally. For production services, register secrets only through your provider's official setup flow.",
+      },
+      {
+        variant: 'warning' as const,
+        content: (
+          <>
+            <strong>Protect your secret:</strong> Anyone with your TOTP secret or QR code can generate your codes.
+            Do not share QR codes, screenshots, or backup codes.
+          </>
+        ),
+      },
+    ],
+    howItWorks:
+      'TOTP codes and QR codes are generated locally using RFC 6238-compatible logic. Secrets stay in your browser session unless you copy them elsewhere.',
+    limitations:
+      'Treat TOTP secrets like passwords. Do not share QR codes or screenshots. Save backup codes offline and use a trusted authenticator app for production accounts.',
+    privacyNote: 'Secrets and backup codes are not sent to SecureTools servers.',
+  };
+
   return (
     <ToolLayout
       title="Two-Factor Authentication Generator"
-      description="Generate TOTP codes, QR codes for authenticator apps, and backup codes. Secure 2FA setup tool that runs entirely in your browser."
+      description="Generate RFC 6238 TOTP codes, scannable otpauth QR codes, and backup codes locally in your browser."
     >
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Setup Configuration */}
-        <Card>
+        <Card className="tool-workspace">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
@@ -333,17 +355,20 @@ export default function TwoFactorAuth() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <Alert className="surface-warning border">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-sm">
+                    Treat this QR code and secret like a password.
+                  </AlertDescription>
+                </Alert>
                 {qrCodeData && (
                   <div className="space-y-4">
                     <div className="text-center">
                       <div className="inline-block p-4 bg-white rounded-lg border-2 border-gray-200">
-                        {/* QR Code would be rendered here using a QR code library */}
-                        <div className="w-48 h-48 bg-gray-100 rounded flex items-center justify-center">
-                          <QrCode className="h-24 w-24 text-gray-400" />
-                        </div>
+                        <QRCode value={qrCodeData} size={192} level="M" />
                       </div>
                       <p className="text-sm text-muted-foreground mt-2">
-                        Scan with your authenticator app
+                        Scan with Google Authenticator, Authy, or another RFC 6238 app
                       </p>
                     </div>
                     
@@ -383,12 +408,11 @@ export default function TwoFactorAuth() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Alert>
+                <Alert className="surface-warning border">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Important:</strong> Store these backup codes in a secure location. 
-                    Each code can only be used once. If you lose access to your authenticator app, 
-                    you can use these codes to regain access.
+                    <strong>Important:</strong> Store backup codes offline. Do not save them in screenshots or shared notes.
+                    Each code can only be used once.
                   </AlertDescription>
                 </Alert>
 
@@ -423,129 +447,98 @@ export default function TwoFactorAuth() {
           </TabsContent>
         </Tabs>
 
-        {/* Why Use + Key Features */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Why Use 2FA Generator?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Enhanced Account Security</p>
-                  <p className="text-sm text-muted-foreground">Add an extra layer of security to your accounts with time-based one-time passwords that change every 30 seconds.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Easy Setup Process</p>
-                  <p className="text-sm text-muted-foreground">Generate QR codes and backup codes for easy integration with authenticator apps like Google Authenticator or Authy.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Industry Standard Compliance</p>
-                  <p className="text-sm text-muted-foreground">Uses RFC 6238 TOTP standard ensuring compatibility with all major authenticator applications and services.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Backup Code Generation</p>
-                  <p className="text-sm text-muted-foreground">Generate secure backup codes to regain access if you lose your authenticator device or app.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <ToolTrustSection {...toolTrust} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Key Features
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">TOTP code generation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">QR code for authenticator apps</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Backup codes generation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">RFC 6238 compliant</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Base32 secret encoding</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Real-time code updates</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Privacy-focused (all processing in browser)</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Security Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">TOTP Security</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>RFC 6238 compliant:</strong> Industry standard TOTP</li>
-                  <li>• <strong>30-second time windows:</strong> Codes expire quickly</li>
-                  <li>• <strong>HMAC-SHA1 algorithm:</strong> Cryptographically secure</li>
-                  <li>• <strong>Base32 encoding:</strong> Safe for QR codes and manual entry</li>
-                  <li>• <strong>6-digit codes:</strong> Balance of security and usability</li>
-                  <li>• <strong>Clock drift tolerance:</strong> Handles time synchronization</li>
+        <ToolDetailsAccordion
+          sections={[
+            buildTrustDetailsAccordionSection(toolTrust),
+            {
+              id: 'why-use',
+              title: 'Why use this tool',
+              content: (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Learn and test TOTP</p>
+                      <p>Generate time-based one-time passwords that change every 30 seconds for setup practice.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">QR setup data</p>
+                      <p>Create QR codes and backup codes for authenticator apps like Google Authenticator or Authy.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">RFC 6238 compatible</p>
+                      <p>Uses the standard TOTP algorithm for broad authenticator compatibility.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Backup codes</p>
+                      <p>Generate one-time backup codes for testing recovery workflows.</p>
+                    </div>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              id: 'key-features',
+              title: 'Key features',
+              content: (
+                <ul className="space-y-2 list-disc pl-5">
+                  <li>TOTP code generation</li>
+                  <li>QR code for authenticator apps</li>
+                  <li>Backup codes generation</li>
+                  <li>RFC 6238 compliant</li>
+                  <li>Base32 secret encoding</li>
+                  <li>Real-time code updates</li>
+                  <li>Privacy-focused — all processing in browser</li>
                 </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Implementation Features</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• Web Crypto API for secure randomness</li>
-                  <li>• QR code generation for easy setup</li>
-                  <li>• Real-time code updates every 30 seconds</li>
-                  <li>• Manual secret entry option</li>
-                  <li>• Privacy-focused (all processing in browser)</li>
-                  <li>• Compatible with Google Authenticator, Authy</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Badge variant="secondary">TOTP</Badge>
-              <Badge variant="secondary">RFC 6238</Badge>
-              <Badge variant="secondary">HMAC-SHA1</Badge>
-              <Badge variant="secondary">QR Code</Badge>
-            </div>
-          </CardContent>
-        </Card>
+              ),
+            },
+            {
+              id: 'security-info',
+              title: 'Security information',
+              content: (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">TOTP security</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li><strong>RFC 6238 compliant:</strong> Industry standard TOTP</li>
+                      <li><strong>30-second time windows:</strong> Codes expire quickly</li>
+                      <li><strong>HMAC-SHA1 algorithm:</strong> Standard TOTP construction</li>
+                      <li><strong>Base32 encoding:</strong> Safe for QR codes and manual entry</li>
+                      <li><strong>6-digit codes:</strong> Balance of security and usability</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Implementation features</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li>Web Crypto API for secure randomness</li>
+                      <li>QR code generation for easy setup</li>
+                      <li>Real-time code updates every 30 seconds</li>
+                      <li>Manual secret entry option</li>
+                      <li>Compatible with Google Authenticator, Authy</li>
+                    </ul>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">TOTP</Badge>
+                    <Badge variant="secondary">RFC 6238</Badge>
+                    <Badge variant="secondary">HMAC-SHA1</Badge>
+                    <Badge variant="secondary">QR Code</Badge>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
       </div>
     </ToolLayout>
   );

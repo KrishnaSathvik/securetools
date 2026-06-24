@@ -16,7 +16,7 @@ export const FAQ = () => {
   const faqData = [
     {
       question: "What is SecureTools?",
-      answer: "SecureTools is a collection of free, professional security tools that run entirely in your browser. Our tools include password generator, text encryptor, security headers checker, 2FA generator, random data generator, and password strength analyzer - all with military-grade encryption."
+      answer: "SecureTools is a collection of free, privacy-focused security tools that run entirely in your browser. Our tools include password generator, text encryptor, security headers checker (educational demo), 2FA generator, random data generator, and password strength analyzer — all with local browser processing."
     },
     {
       question: "Are the tools really free?",
@@ -71,11 +71,11 @@ export const FAQ = () => {
     {
       title: "General Questions",
       icon: HelpCircle,
-      color: "text-blue-500",
+      color: "text-info",
       items: [
         {
           question: "What is SecureTools?",
-          answer: "SecureTools is a collection of free, privacy-focused security tools that run entirely in your browser. It includes password generator, text encryptor, security headers checker, 2FA generator, random data generator, and password strength analyzer. All data processing happens locally on your device with military-grade encryption."
+          answer: "SecureTools is a collection of free, privacy-focused security tools that run entirely in your browser. It includes password generator, text encryptor, security headers checker (educational demo), 2FA generator, random data generator, and password strength analyzer. All data processing happens locally on your device."
         },
         {
           question: "Is SecureTools really free?",
@@ -94,11 +94,11 @@ export const FAQ = () => {
     {
       title: "Privacy & Security",
       icon: Shield,
-      color: "text-green-500",
+      color: "text-success",
       items: [
         {
           question: "Is my data safe with SecureTools?",
-          answer: "Absolutely! All processing happens locally in your browser with military-grade encryption. Your passwords, encrypted data, and other sensitive information never leaves your device and is never sent to our servers. This ensures maximum privacy and security."
+          answer: "All processing happens locally in your browser. Your passwords, encrypted data, and other sensitive information never leaves your device and is never sent to our servers. This ensures maximum privacy, but you should still use trusted devices and browsers."
         },
         {
           question: "Do you store any of my data?",
@@ -117,19 +117,19 @@ export const FAQ = () => {
     {
       title: "Security Features",
       icon: Lock,
-      color: "text-purple-500",
+      color: "text-primary",
       items: [
         {
           question: "How secure is the password generator?",
-          answer: "Our password generator uses the Web Crypto API for cryptographically secure random number generation. It provides true randomness and includes entropy calculations to show password strength. All generation happens locally in your browser with military-grade security."
+          answer: "Our password generator uses the Web Crypto API for cryptographically secure random number generation. It provides entropy calculations to show password strength. All generation happens locally in your browser."
         },
         {
           question: "How secure is the text encryptor?",
-          answer: "Our text encryptor uses AES-256-GCM encryption with PBKDF2 key derivation, which is military-grade encryption. It provides the same level of security used by banks and government agencies. All encryption happens locally in your browser."
+          answer: "Our text encryptor uses AES-256-GCM encryption with PBKDF2 key derivation — industry-standard browser-based encryption. Security depends on your passphrase strength. All encryption happens locally in your browser."
         },
         {
           question: "How does the security headers checker work?",
-          answer: "The security headers checker analyzes website security headers like HSTS, CSP, X-Frame-Options, and SSL/TLS certificates. It provides a comprehensive security score and recommendations for improving website security."
+          answer: "The security headers checker is an educational demo. Browsers block reading response headers from arbitrary sites (CORS), so results are simulated locally to teach common headers like HSTS, CSP, and X-Frame-Options. It is not a live security audit — real validation requires server-side scanning."
         },
         {
           question: "How does the 2FA generator work?",
@@ -140,7 +140,7 @@ export const FAQ = () => {
     {
       title: "Performance & Features",
       icon: Zap,
-      color: "text-yellow-500",
+      color: "text-warning",
       items: [
         {
           question: "How fast are the tools?",
@@ -152,7 +152,7 @@ export const FAQ = () => {
         },
         {
           question: "How secure is the random data generator?",
-          answer: "Our random data generator uses the Web Crypto API for cryptographically secure random number generation. It generates truly random strings, UUIDs, and cryptographic data suitable for security-sensitive applications."
+          answer: "Our random data generator uses the Web Crypto API for cryptographically secure random number generation. It is useful for test data, placeholders, and development samples. For production secrets, use your infrastructure's approved secret-management process."
         },
         {
           question: "Are there keyboard shortcuts?",
@@ -163,11 +163,11 @@ export const FAQ = () => {
     {
       title: "Technical Details",
       icon: Code2,
-      color: "text-indigo-500",
+      color: "text-primary",
       items: [
         {
           question: "What technologies does SecureTools use?",
-          answer: "SecureTools is built with React 18, TypeScript, Vite, and Tailwind CSS. We use the Web Crypto API for military-grade encryption, AES-256-GCM for text encryption, and PBKDF2 for key derivation. All security features use industry-standard cryptographic methods."
+          answer: "SecureTools is built with React 18, TypeScript, Vite, and Tailwind CSS. We use the Web Crypto API, AES-256-GCM for text encryption, and PBKDF2 for key derivation. All security features use industry-standard cryptographic methods."
         },
         {
           question: "Is SecureTools open source?",
@@ -186,7 +186,7 @@ export const FAQ = () => {
     {
       title: "Troubleshooting",
       icon: Users,
-      color: "text-red-500",
+      color: "text-destructive",
       items: [
         {
           question: "Why is a tool not working?",
@@ -211,7 +211,7 @@ export const FAQ = () => {
   return (
     <ToolLayout
       title="Frequently Asked Questions"
-      description="Find answers to common questions about SecureTools. Learn about privacy, features, performance, and how to get the most out of our security tools with military-grade encryption."
+      description="Find answers to common questions about SecureTools. Learn about privacy, features, limitations, and how to get the most out of our security tools."
     >
       <div className="p-6 max-w-4xl mx-auto">
 

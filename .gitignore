@@ -23,4 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+.env
 .env*.local
+temp_backup
+temp_test_files

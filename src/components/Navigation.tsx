@@ -1,63 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Code2, Menu, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { SEARCH_INDEX, type SearchResultType } from '@/data/searchIndex';
 
-/**
- * Available security tools in the navigation
- */
 const tools = [
-  { name: 'Password', path: '/password-generator', full: 'Password & Passphrase Generator' },
-  { name: 'Encryptor', path: '/text-encryptor', full: 'Text Encryptor/Decryptor' },
-  { name: 'Headers', path: '/security-headers-checker', full: 'Security Headers Checker' },
-  { name: '2FA', path: '/two-factor-auth', full: 'Two-Factor Authentication Generator' },
-  { name: 'Random', path: '/random-data-generator', full: 'Random Data Generator' },
-  { name: 'Analyzer', path: '/password-strength-analyzer', full: 'Password Strength Analyzer' }
+  { name: 'Password', path: '/password-generator', full: 'Password & Passphrase Generator', keywords: ['password', 'cspng', 'passphrase', 'diceware'] },
+  { name: 'Encryptor', path: '/text-encryptor', full: 'Text Encryptor/Decryptor', keywords: ['encrypt', 'aes-gcm', 'base64', 'cipher'] },
+  { name: 'Headers (Demo)', path: '/security-headers-checker', full: 'Security Headers Checker (Demo)', keywords: ['headers', 'demo', 'hsts', 'csp'] },
+  { name: '2FA', path: '/two-factor-auth', full: 'Two-Factor Authentication Generator', keywords: ['2fa', 'totp', 'authenticator', 'qr'] },
+  { name: 'Random', path: '/random-data-generator', full: 'Random Data Generator', keywords: ['random', 'token', 'uuid', 'api key'] },
+  { name: 'Analyzer', path: '/password-strength-analyzer', full: 'Password Strength Analyzer', keywords: ['password strength', 'breach database', 'pattern', 'analyzer'] },
 ];
 
-/**
- * Navigation - The main navigation component for SecureTools
- * 
- * Features:
- * - Responsive design with mobile hamburger menu
- * - Command palette search (Ctrl/Cmd + K)
- * - Theme toggle (dark/light mode)
- * - Active route highlighting
- * - Tool search functionality
- * - SecureTools branding with logo
- * 
- * @example
- * ```tsx
- * // Used in ToolLayout or main app layout
- * <Navigation />
- * 
- * // Automatically handles:
- * // - Route highlighting based on current location
- * // - Mobile responsive behavior
- * // - Keyboard shortcuts (Cmd/Ctrl + K for search)
- * // - Theme switching
- * ```
- * 
- * Keyboard Shortcuts:
- * - `Ctrl/Cmd + K` - Open command palette search
- * - `Escape` - Close search palette
- * 
- * Responsive Behavior:
- * - Desktop: Horizontal navigation with all tools visible
- * - Mobile: Hamburger menu with collapsible tool list
- * - Search: Hidden on small screens, visible on sm+
- * 
- * @returns JSX element containing the complete navigation interface
- */
 export const Navigation = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Generate breadcrumb data
-  const generateBreadcrumbs = () => {
+  const searchIndex = SEARCH_INDEX;
+
+  useEffect(() => {
     const pathSegments = location.pathname.split('/').filter(Boolean);
     const breadcrumbs = [
       {
@@ -82,24 +49,17 @@ export const Navigation = () => {
       });
     });
 
-    return {
+    const breadcrumbData = {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: breadcrumbs
     };
-  };
-
-  // Add breadcrumb structured data
-  useEffect(() => {
-    const breadcrumbData = generateBreadcrumbs();
     
-    // Remove existing breadcrumb data
     const existingScript = document.querySelector('script[data-breadcrumb]');
     if (existingScript) {
       existingScript.remove();
     }
 
-    // Add new breadcrumb data
     const script = document.createElement('script');
     script.type = 'application/ld+json';
     script.setAttribute('data-breadcrumb', 'true');
@@ -130,60 +90,86 @@ export const Navigation = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const filteredTools = tools.filter(tool =>
-    tool.full.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    if (isSearchOpen) {
+      searchInputRef.current?.focus();
+    }
+  }, [isSearchOpen]);
 
-  const handleToolSelect = (path: string) => {
+  const filteredResults = searchIndex.filter((item) => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+    const haystack = [item.name, ...item.keywords].join(' ').toLowerCase();
+    return haystack.includes(query);
+  });
+
+  const handleResultSelect = (path: string) => {
     setIsSearchOpen(false);
     setSearchQuery('');
     setIsMobileMenuOpen(false);
+    navigate(path);
+  };
+
+  const typeBadgeClass: Record<SearchResultType, string> = {
+    Tool: 'bg-success/15 text-success',
+    Article: 'bg-info/15 text-info',
+    Page: 'bg-secondary text-muted-foreground',
   };
 
   return (
     <>
       <nav className="bg-nav-background border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-12 sm:h-14">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <img 
-                src="/favicon.svg" 
-                alt="SecureTools Logo" 
-                className="w-5 h-5"
-              />
-              <span className="text-base font-semibold text-foreground bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                SecureTools
-              </span>
-            </Link>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-12 sm:h-14 gap-4">
+            <div className="flex items-center gap-1 min-w-0">
+              <Link to="/" className="flex items-center gap-2 shrink-0 mr-2 sm:mr-4">
+                <img 
+                  src="/favicon.svg" 
+                  alt="SecureTools Logo" 
+                  className="w-5 h-5"
+                />
+                <span className="text-base font-semibold text-foreground">
+                  SecureTools
+                </span>
+              </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1">
-              {tools.map((tool) => (
+              <div className="hidden lg:flex items-center gap-0.5">
+                {tools.map((tool) => (
+                  <Link
+                    key={tool.path}
+                    to={tool.path}
+                    className={`px-2.5 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+                      location.pathname === tool.path
+                        ? 'text-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {tool.name}
+                  </Link>
+                ))}
                 <Link
-                  key={tool.path}
-                  to={tool.path}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname === tool.path
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  to="/blog"
+                  className={`px-2.5 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+                    location.pathname.startsWith('/blog')
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  {tool.name}
+                  Guides
                 </Link>
-              ))}
+              </div>
             </div>
 
-            {/* Search & Mobile Menu */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <ThemeToggle />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsSearchOpen(true)}
                 className="hidden sm:flex items-center gap-1.5 px-2 py-1.5 h-8"
+                aria-label="Open search"
               >
-                <Search className="w-3.5 h-3.5" />
+                <Search className="w-3.5 h-3.5" aria-hidden />
                 <span className="hidden md:inline text-xs">Search</span>
                 <kbd className="hidden md:inline-flex h-4 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-xs text-muted-foreground">
                   ⌘K
@@ -195,13 +181,14 @@ export const Navigation = () => {
                 size="sm"
                 className="lg:hidden p-1.5 h-8 w-8"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isMobileMenuOpen}
               >
                 {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </Button>
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className="lg:hidden py-4 border-t border-border bg-card/50 backdrop-blur-sm">
               <div className="space-y-2 px-2">
@@ -219,17 +206,28 @@ export const Navigation = () => {
                     {tool.full}
                   </Link>
                 ))}
+                <Link
+                  to="/blog"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname.startsWith('/blog')
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  Guides
+                </Link>
                 
-                {/* Mobile Search Button */}
                 <button
+                  type="button"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     setIsSearchOpen(true);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                 >
-                  <Search className="w-4 h-4" />
-                  Search Tools
+                  <Search className="w-4 h-4" aria-hidden />
+                  Search
                 </button>
               </div>
             </div>
@@ -237,42 +235,50 @@ export const Navigation = () => {
         </div>
       </nav>
 
-
-      {/* Command Palette */}
       {isSearchOpen && (
         <div 
           className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Search SecureTools"
           onClick={() => setIsSearchOpen(false)}
         >
-          <div className="fixed left-1/2 top-1/4 sm:top-1/3 -translate-x-1/2 -translate-y-1/2 w-[95vw] sm:w-[90vw] max-w-lg">
+          <div 
+            className="fixed left-1/2 top-1/4 sm:top-1/3 -translate-x-1/2 -translate-y-1/2 w-[95vw] sm:w-[90vw] max-w-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="bg-card border border-border rounded-lg shadow-lg">
               <div className="flex items-center gap-3 p-4 border-b border-border">
-                <Search className="w-5 h-5 text-muted-foreground" />
+                <Search className="w-5 h-5 text-muted-foreground" aria-hidden />
                 <input
-                  type="text"
-                  placeholder="Search tools..."
+                  ref={searchInputRef}
+                  type="search"
+                  placeholder="Search tools, articles, pages..."
                   className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-base"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
+                  aria-label="Search tools, articles, and pages"
                 />
                 <kbd className="hidden sm:inline-flex px-2 py-1 text-xs text-muted-foreground bg-muted rounded">ESC</kbd>
               </div>
-              <div className="max-h-64 overflow-y-auto">
-                {filteredTools.length > 0 ? (
-                  filteredTools.map((tool) => (
-                    <Link
-                      key={tool.path}
-                      to={tool.path}
-                      onClick={() => handleToolSelect(tool.path)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-b-0"
+              <div className="max-h-72 overflow-y-auto">
+                {filteredResults.length > 0 ? (
+                  filteredResults.slice(0, 12).map((result) => (
+                    <button
+                      key={`${result.type}-${result.path}`}
+                      type="button"
+                      onClick={() => handleResultSelect(result.path)}
+                      className="flex w-full items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-b-0 text-left"
                     >
-                      <div className="font-medium text-foreground text-sm sm:text-base">{tool.full}</div>
-                    </Link>
+                      <span className={`text-xs font-medium rounded px-1.5 py-0.5 shrink-0 ${typeBadgeClass[result.type]}`}>
+                        {result.type}
+                      </span>
+                      <span className="font-medium text-foreground text-sm truncate">{result.name}</span>
+                    </button>
                   ))
                 ) : (
                   <div className="px-4 py-8 text-center text-muted-foreground text-sm">
-                    No tools found for "{searchQuery}"
+                    No results for &ldquo;{searchQuery}&rdquo;
                   </div>
                 )}
               </div>

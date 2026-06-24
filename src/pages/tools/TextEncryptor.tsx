@@ -9,8 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Lock, Unlock, Eye, EyeOff, AlertCircle, CheckCircle, Target, Zap } from 'lucide-react';
+import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
+import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
 import { trackTextProcessing, trackInteraction, trackTextEncryption, trackConversion } from '@/lib/analytics';
 
 /**
@@ -39,7 +42,12 @@ export default function TextEncryptor() {
     title: 'Text Encryptor/Decryptor - AES-256 Encryption Tool | SecureTools',
     description: 'Encrypt and decrypt text with AES-256 encryption, Base64 encoding, URL encoding, and ROT13 cipher. Secure text encryption tool that runs entirely in your browser.',
     keywords: 'text encryptor, text decryptor, AES encryption, Base64 encoding, URL encoding, ROT13 cipher, cryptography, security tools',
-    canonical: 'https://www.securetools.dev/text-encryptor'
+    canonical: 'https://www.securetools.dev/text-encryptor',
+    structuredData: buildWebApplicationSchema({
+      name: 'Text Encryptor/Decryptor',
+      description: 'Browser-based AES-256-GCM encryption and encoding utilities.',
+      path: '/text-encryptor',
+    }),
   });
 
   // AES-256 Encryption/Decryption
@@ -292,6 +300,18 @@ export default function TextEncryptor() {
     setError('');
   };
 
+  const toolTrust = {
+    badges: [
+      { label: 'AES-GCM', variant: 'aes-gcm' as const },
+      { label: 'Local', variant: 'local' as const },
+    ],
+    howItWorks:
+      'Encryption and encoding run entirely in your browser. AES-256-GCM uses your passphrase with PBKDF2 key derivation.',
+    limitations:
+      'Security depends on passphrase strength. Losing the passphrase means losing access. Never send encrypted text and the passphrase together through the same channel.',
+    privacyNote: 'Your text and passphrase are not uploaded to SecureTools servers.',
+  };
+
   return (
     <ToolLayout
       title="Text Encryptor/Decryptor"
@@ -299,32 +319,39 @@ export default function TextEncryptor() {
     >
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Encryption Methods */}
-        <Card>
+        <Card className="tool-workspace">
           <CardHeader>
             <CardTitle>Encryption Methods</CardTitle>
             <CardDescription>
-              Choose your preferred encryption method. All processing happens locally in your browser.
+              Choose your preferred method. All processing happens locally in your browser.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="aes">AES-256</TabsTrigger>
-                <TabsTrigger value="base64">Base64</TabsTrigger>
-                <TabsTrigger value="url">URL</TabsTrigger>
-                <TabsTrigger value="rot13">ROT13</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1">
+                <TabsTrigger value="aes" className="text-xs sm:text-sm">AES-GCM encryption</TabsTrigger>
+                <TabsTrigger value="base64" className="text-xs sm:text-sm">Base64 encoding</TabsTrigger>
+                <TabsTrigger value="url" className="text-xs sm:text-sm">URL encoding</TabsTrigger>
+                <TabsTrigger value="rot13" className="text-xs sm:text-sm">ROT13 transform</TabsTrigger>
               </TabsList>
+
+              <p className="text-sm text-muted-foreground mt-4 mb-2 rounded-md border border-border/60 bg-muted/30 px-3 py-2">
+                {activeTab === 'aes' && 'AES-GCM encrypts text using your passphrase.'}
+                {activeTab === 'base64' && 'Base64 is encoding, not encryption.'}
+                {activeTab === 'url' && 'URL encoding is for safe transmission in URLs — not encryption.'}
+                {activeTab === 'rot13' && 'ROT13 is a simple text transformation, not security.'}
+              </p>
               
               <TabsContent value="aes" className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Passphrase</Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter encryption password"
+                      placeholder="Enter encryption passphrase"
                       className="pr-10"
                     />
                     <Button
@@ -333,13 +360,20 @@ export default function TextEncryptor() {
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Hide passphrase' : 'Show passphrase'}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Uses AES-256-GCM encryption with PBKDF2 key derivation
+                    Uses AES-256-GCM encryption with PBKDF2 key derivation.
                   </p>
+                  <Alert className="surface-warning border">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-sm">
+                      If you forget the passphrase, SecureTools cannot recover the encrypted text.
+                    </AlertDescription>
+                  </Alert>
                 </div>
               </TabsContent>
               
@@ -459,125 +493,96 @@ export default function TextEncryptor() {
           </Button>
         </div>
 
-        {/* Why Use + Key Features */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Why Use Text Encryptor?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Secure Data Protection</p>
-                  <p className="text-sm text-muted-foreground">Encrypt sensitive text using AES-256-GCM encryption, the same standard used by banks and government agencies.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Multiple Encoding Options</p>
-                  <p className="text-sm text-muted-foreground">Handle Base64, URL encoding, and ROT13 cipher for various data representation and obfuscation needs.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Password-Based Security</p>
-                  <p className="text-sm text-muted-foreground">Use strong passwords with PBKDF2 key derivation to secure your encrypted data with military-grade protection.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Local Processing</p>
-                  <p className="text-sm text-muted-foreground">All encryption happens in your browser - your sensitive data never leaves your device for maximum privacy.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <ToolTrustSection {...toolTrust} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Key Features
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">AES-256-GCM encryption</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">PBKDF2 key derivation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Base64 encoding/decoding</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">URL encoding/decoding</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">ROT13 cipher</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Web Crypto API integration</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Privacy-focused (all processing in browser)</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Security Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              Security Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-semibold mb-2">AES-256 Encryption</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Military-grade encryption standard</li>
-                  <li>• 256-bit key length</li>
-                  <li>• GCM mode for authenticated encryption</li>
-                  <li>• PBKDF2 key derivation (100,000 iterations)</li>
+        <ToolDetailsAccordion
+          sections={[
+            buildTrustDetailsAccordionSection(toolTrust),
+            {
+              id: 'why-use',
+              title: 'Why use this tool',
+              content: (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Authenticated encryption</p>
+                      <p>AES-GCM is a widely used authenticated encryption mode for protecting text with a passphrase.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Encoding utilities</p>
+                      <p>Base64 and URL encoding for data representation — distinct from encryption.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Passphrase-based keys</p>
+                      <p>PBKDF2 key derivation from your passphrase. Strength depends on passphrase quality.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Local processing</p>
+                      <p>All operations happen in your browser — sensitive text is not uploaded.</p>
+                    </div>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              id: 'key-features',
+              title: 'Key features',
+              content: (
+                <ul className="space-y-2 list-disc pl-5">
+                  <li>AES-256-GCM encryption</li>
+                  <li>PBKDF2 key derivation</li>
+                  <li>Base64 encoding/decoding</li>
+                  <li>URL encoding/decoding</li>
+                  <li>ROT13 text transformation</li>
+                  <li>Web Crypto API integration</li>
+                  <li>Privacy-focused — all processing in browser</li>
                 </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Local Processing</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• All encryption happens in your browser</li>
-                  <li>• No data sent to servers</li>
-                  <li>• Your text never leaves your device</li>
-                  <li>• Uses Web Crypto API for security</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">AES-256-GCM</Badge>
-              <Badge variant="secondary">PBKDF2</Badge>
-              <Badge variant="secondary">Web Crypto API</Badge>
-              <Badge variant="secondary">Local Processing</Badge>
-            </div>
-          </CardContent>
-        </Card>
+              ),
+            },
+            {
+              id: 'security-info',
+              title: 'Security information',
+              content: (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">AES-256 encryption</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li>Industry-standard AES-256-GCM encryption</li>
+                      <li>256-bit key length</li>
+                      <li>GCM mode for authenticated encryption</li>
+                      <li>PBKDF2 key derivation (100,000 iterations)</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Local processing</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li>All encryption happens in your browser</li>
+                      <li>No data sent to servers</li>
+                      <li>Your text never leaves your device</li>
+                      <li>Uses Web Crypto API for security</li>
+                    </ul>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">AES-256-GCM</Badge>
+                    <Badge variant="secondary">PBKDF2</Badge>
+                    <Badge variant="secondary">Web Crypto API</Badge>
+                    <Badge variant="secondary">Local Processing</Badge>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
       </div>
     </ToolLayout>
   );

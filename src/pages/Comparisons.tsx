@@ -11,7 +11,7 @@ import { useSEO } from '@/hooks/useSEO';
 export const Comparisons = () => {
   useSEO({
     title: 'SecureTools vs Other Security Tools | Feature Comparison & Reviews',
-    description: 'Compare SecureTools with other popular security tool websites. See why users choose SecureTools for privacy, speed, and comprehensive security tools with military-grade encryption.',
+    description: 'Compare SecureTools with other popular security tool websites. See why users choose SecureTools for privacy, speed, and honest browser-based security tools.',
     keywords: 'security tools comparison, password generator comparison, text encryptor comparison, 2FA generator comparison, security headers checker comparison, tool reviews, security utilities comparison',
     canonical: 'https://www.securetools.dev/comparisons',
     structuredData: {
@@ -125,7 +125,7 @@ export const Comparisons = () => {
   const comparisonFeatures = [
     {
       name: 'Privacy & Security',
-      description: 'All processing happens locally in your browser with military-grade encryption',
+      description: 'All processing happens locally in your browser',
       securetools: '✅ Complete privacy',
       competitors: '❌ Data sent to servers'
     },
@@ -150,7 +150,7 @@ export const Comparisons = () => {
     {
       name: 'Cryptographic Security',
       description: 'Uses Web Crypto API with AES-256-GCM encryption',
-      securetools: '✅ Military-grade encryption',
+      securetools: '✅ Browser-based AES-256-GCM (encryptor)',
       competitors: '❌ Basic security'
     },
     {
@@ -176,7 +176,7 @@ export const Comparisons = () => {
   return (
     <ToolLayout
       title="SecureTools vs Competitors"
-      description="Compare SecureTools with other popular security tool websites. See why SecureTools is the best choice for privacy-focused, comprehensive security tools with military-grade encryption."
+      description="Compare SecureTools with other popular security tool websites. See why SecureTools is a strong choice for privacy-focused, browser-based security tools."
     >
       <div className="p-6 max-w-6xl mx-auto">
         {/* Hero Section */}
@@ -184,7 +184,7 @@ export const Comparisons = () => {
           <h1 className="text-4xl font-bold text-foreground mb-4">Why Choose SecureTools?</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Discover the key advantages that make SecureTools the preferred choice for 
-            users who value privacy, security, and comprehensive security functionality with military-grade encryption.
+            users who value privacy, security, and honest tool limitations.
           </p>
         </div>
 
@@ -195,7 +195,7 @@ export const Comparisons = () => {
             <div className="bg-card border border-border rounded-lg p-6 text-center">
               <Shield className="w-12 h-12 text-success mx-auto mb-4" />
               <h3 className="text-lg font-bold text-foreground mb-2">Security First</h3>
-              <p className="text-sm text-muted-foreground">All processing happens locally in your browser with military-grade encryption. Your sensitive data never leaves your device.</p>
+              <p className="text-sm text-muted-foreground">All processing happens locally in your browser. Your sensitive data never leaves your device. The Security Headers Checker is an educational demo, not a live audit.</p>
             </div>
             <div className="bg-card border border-border rounded-lg p-6 text-center">
               <Code2 className="w-12 h-12 text-primary mx-auto mb-4" />
@@ -239,13 +239,13 @@ export const Comparisons = () => {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-green-500 text-lg font-bold">✓</span>
+                          <span className="text-success text-lg font-bold">✓</span>
                           <span className="text-success font-semibold">{feature.securetools.replace('✅ ', '')}</span>
                         </div>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-red-500 text-lg font-bold">✗</span>
+                          <span className="text-destructive text-lg font-bold">✗</span>
                           <span className="text-muted-foreground">{feature.competitors.replace('❌ ', '')}</span>
                         </div>
                       </td>
@@ -349,7 +349,7 @@ export const Comparisons = () => {
               <h3 className="text-xl font-bold text-foreground mb-4">Privacy & Security</h3>
               <p className="text-muted-foreground mb-4">
                 Unlike other tools that send your data to their servers, SecureTools processes 
-                everything locally in your browser with military-grade encryption. This means your passwords, encrypted data, and other 
+                everything locally in your browser. This means your passwords, encrypted data, and other 
                 sensitive information never leaves your device, ensuring maximum privacy and security.
               </p>
               <ul className="bullet-list text-muted-foreground">
@@ -368,7 +368,7 @@ export const Comparisons = () => {
             <h2 className="text-2xl font-bold text-foreground mb-4">Ready to Experience the Difference?</h2>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Try SecureTools today and see why thousands of users choose us for their 
-              daily security needs. Fast, secure, and privacy-focused tools with military-grade encryption that just work.
+              daily security needs. Fast, privacy-focused tools with clear limitations that just work.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a

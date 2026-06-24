@@ -5,7 +5,7 @@ interface SEOProps {
   description: string;
   keywords?: string;
   canonical?: string;
-  structuredData?: Record<string, any>;
+  structuredData?: Record<string, unknown>;
   ogImage?: string;
   ogType?: string;
   twitterCard?: string;
@@ -132,7 +132,7 @@ const updateCanonical = (url: string) => {
 /**
  * Adds structured data as JSON-LD script
  */
-const addStructuredData = (data: Record<string, any>) => {
+const addStructuredData = (data: Record<string, unknown>) => {
   // Remove existing structured data
   removeStructuredData();
   

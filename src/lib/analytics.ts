@@ -25,9 +25,8 @@ declare global {
  * @param measurementId - GA4 Measurement ID (G-XXXXXXXXXX)
  */
 export const initializeAnalytics = (measurementId: string) => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || window.gtag) return;
 
-  // Load Google Analytics script
   const script = document.createElement('script');
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
@@ -41,8 +40,8 @@ export const initializeAnalytics = (measurementId: string) => {
 
   window.gtag('js', new Date());
   window.gtag('config', measurementId, {
-    page_title: document.title,
-    page_location: window.location.href,
+    send_page_view: false,
+    anonymize_ip: true,
   });
 };
 

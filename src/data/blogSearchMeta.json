@@ -1,0 +1,225 @@
+[
+  {
+    "slug": "api-security-authentication",
+    "title": "API Security: Authentication and Authorization Best Practices",
+    "excerpt": "Tokens, scopes, rate limits, and common API auth mistakes—conservative guidance for developers.",
+    "category": "best-practices",
+    "tags": [
+      "API Security",
+      "Authentication",
+      "Authorization",
+      "OAuth"
+    ]
+  },
+  {
+    "slug": "browser-security-tools-honestly-explained",
+    "title": "Browser Security Tools, Honestly Explained",
+    "excerpt": "What SecureTools can do locally in your browser, what each tool cannot promise, and how to choose workflows without overclaiming security.",
+    "category": "best-practices",
+    "tags": [
+      "SecureTools",
+      "Browser Security",
+      "Privacy",
+      "Honest Limits"
+    ],
+    "relatedToolSlug": "/password-generator"
+  },
+  {
+    "slug": "generate-api-keys-and-random-tokens-browser",
+    "title": "Generating API Keys and Random Tokens in the Browser with CSPRNG",
+    "excerpt": "How browser cryptographic randomness works, when random tokens help in dev and testing, and why production secrets need proper secret-management workflows.",
+    "category": "best-practices",
+    "tags": [
+      "CSPRNG",
+      "Random Tokens",
+      "API Keys",
+      "Web Crypto"
+    ],
+    "relatedToolSlug": "/random-data-generator"
+  },
+  {
+    "slug": "incident-response-management",
+    "title": "Incident Response: Security Incident Management and Recovery",
+    "excerpt": "Prepare, detect, contain, and recover from security incidents—with realistic scope for small teams and tool users.",
+    "category": "best-practices",
+    "tags": [
+      "Incident Response",
+      "Security Management",
+      "Recovery"
+    ]
+  },
+  {
+    "slug": "password-security-guide",
+    "title": "The Complete Guide to Password Security: From Creation to Management",
+    "excerpt": "Practical password security: strong generation with CSPRNG, passphrases, managers, MFA, and what browser tools can safely help with.",
+    "category": "passwords",
+    "tags": [
+      "Password Security",
+      "Authentication",
+      "Best Practices",
+      "Security"
+    ],
+    "relatedToolSlug": "/password-generator"
+  },
+  {
+    "slug": "password-strength-analysis-without-breach-database",
+    "title": "Password Strength Analysis Without a Breach Database",
+    "excerpt": "What browser-based password strength analysis can and cannot tell you — entropy, patterns, crack-time estimates, and why no breach lookup means limits.",
+    "category": "passwords",
+    "tags": [
+      "Password Security",
+      "Strength Analyzer",
+      "Entropy",
+      "Privacy"
+    ],
+    "relatedToolSlug": "/password-strength-analyzer"
+  },
+  {
+    "slug": "privacy-protection-data-minimization",
+    "title": "Privacy Protection: Data Minimization and User Rights",
+    "excerpt": "Practical data minimization, user rights, and how browser-based security tools can reduce unnecessary data collection.",
+    "category": "privacy",
+    "tags": [
+      "Privacy Protection",
+      "Data Minimization",
+      "User Rights",
+      "GDPR"
+    ]
+  },
+  {
+    "slug": "secure-coding-defensive-programming",
+    "title": "Secure Coding: Defensive Programming Techniques",
+    "excerpt": "Input validation, safe defaults, and error handling patterns that reduce common vulnerabilities.",
+    "category": "best-practices",
+    "tags": [
+      "Secure Coding",
+      "Defensive Programming",
+      "Validation"
+    ]
+  },
+  {
+    "slug": "secure-development-best-practices",
+    "title": "Secure Development: Security Best Practices for Developers",
+    "excerpt": "Integrate security into design, coding, review, and release—aligned with what SecureTools teaches through its browser utilities.",
+    "category": "best-practices",
+    "tags": [
+      "Secure Development",
+      "Best Practices",
+      "Security",
+      "SDLC"
+    ]
+  },
+  {
+    "slug": "security-headers-checker-demo-explained",
+    "title": "What the SecureTools Security Headers Checker Demo Actually Does",
+    "excerpt": "Why browser-based header checks are simulated, what CORS blocks, and how to use the educational demo without mistaking it for a live audit.",
+    "category": "headers",
+    "tags": [
+      "Security Headers",
+      "Demo",
+      "CORS",
+      "CSP"
+    ],
+    "relatedToolSlug": "/security-headers-checker"
+  },
+  {
+    "slug": "security-headers-web-applications",
+    "title": "Security Headers: Protecting Your Web Applications",
+    "excerpt": "What CSP, HSTS, and related HTTP headers do—and why browser-based header checks are limited without a server-side scanner.",
+    "category": "headers",
+    "tags": [
+      "Security Headers",
+      "CSP",
+      "HSTS",
+      "Web Security"
+    ],
+    "relatedToolSlug": "/security-headers-checker"
+  },
+  {
+    "slug": "security-monitoring-threat-detection",
+    "title": "Security Monitoring: Real-time Threat Detection and Response",
+    "excerpt": "Logging, alerting, and detection concepts for applications—what teams should monitor and what browser tools do not do.",
+    "category": "monitoring",
+    "tags": [
+      "Security Monitoring",
+      "Logging",
+      "Detection"
+    ]
+  },
+  {
+    "slug": "security-testing-automated",
+    "title": "Security Testing: Automated Security Testing for Applications",
+    "excerpt": "Where SAST, dependency scanning, and DAST fit—and what browser security demos do not cover.",
+    "category": "best-practices",
+    "tags": [
+      "Security Testing",
+      "SAST",
+      "DAST",
+      "CI"
+    ]
+  },
+  {
+    "slug": "totp-secrets-qr-codes-safety-guide",
+    "title": "Protecting TOTP Secrets, QR Codes, and Backup Codes",
+    "excerpt": "How to handle authenticator setup safely: secret storage, QR screenshots, backup codes, and when to use the SecureTools 2FA generator.",
+    "category": "2fa",
+    "tags": [
+      "2FA",
+      "TOTP",
+      "QR Codes",
+      "Backup Codes"
+    ],
+    "relatedToolSlug": "/two-factor-auth"
+  },
+  {
+    "slug": "two-factor-authentication-guide",
+    "title": "Two-Factor Authentication: Implementation and Best Practices",
+    "excerpt": "How TOTP, QR codes, and backup codes work—and how SecureTools implements RFC 6238 locally with otplib.",
+    "category": "2fa",
+    "tags": [
+      "Two-Factor Authentication",
+      "Security",
+      "Authentication",
+      "TOTP"
+    ],
+    "relatedToolSlug": "/two-factor-auth"
+  },
+  {
+    "slug": "understanding-encryption",
+    "title": "Understanding Encryption: A Developer's Guide to Data Protection",
+    "excerpt": "Encryption fundamentals for developers: symmetric vs asymmetric crypto, AES-GCM in the browser, and how that differs from encoding.",
+    "category": "encryption",
+    "tags": [
+      "Encryption",
+      "Data Protection",
+      "Security",
+      "Cryptography"
+    ],
+    "relatedToolSlug": "/text-encryptor"
+  },
+  {
+    "slug": "web-application-security-vulnerabilities",
+    "title": "Web Application Security: Common Vulnerabilities and Prevention",
+    "excerpt": "XSS, CSRF, injection, and misconfiguration—practical prevention aligned with headers and secure coding.",
+    "category": "headers",
+    "tags": [
+      "Web Security",
+      "Vulnerabilities",
+      "XSS",
+      "CSRF"
+    ]
+  },
+  {
+    "slug": "what-securetools-text-encryptor-does",
+    "title": "What SecureTools Text Encryptor Actually Does",
+    "excerpt": "An honest guide to AES-GCM vs encoding, local browser processing, passphrase strength, and what browser-based encryption can and cannot protect.",
+    "category": "encryption",
+    "tags": [
+      "Encryption",
+      "AES-GCM",
+      "Text Encryptor",
+      "Encoding"
+    ],
+    "relatedToolSlug": "/text-encryptor"
+  }
+]

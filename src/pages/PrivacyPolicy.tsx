@@ -10,8 +10,8 @@ import { useSEO } from '@/hooks/useSEO';
 export const PrivacyPolicy = () => {
   useSEO({
     title: 'Privacy Policy - SecureTools Security Tools | Data Protection & Privacy',
-    description: 'Learn how SecureTools protects your privacy and handles your data. All processing happens locally in your browser with military-grade encryption. No data collection, no tracking, complete privacy.',
-    keywords: 'privacy policy, data protection, privacy-focused, no tracking, local processing, browser-based security tools, GDPR compliant, user privacy, military-grade encryption',
+    description: 'Learn how SecureTools protects your privacy and handles your data. All processing happens locally in your browser. No data collection, no tracking, complete privacy.',
+    keywords: 'privacy policy, data protection, privacy-focused, no tracking, local processing, browser-based security tools, GDPR compliant, user privacy, local browser encryption',
     canonical: 'https://www.securetools.dev/privacy',
     structuredData: {
       '@context': 'https://schema.org',
@@ -32,7 +32,7 @@ export const PrivacyPolicy = () => {
   return (
     <ToolLayout
       title="Privacy Policy"
-      description="Learn how SecureTools protects your privacy and handles your data. All processing happens locally in your browser with military-grade encryption."
+      description="Learn how SecureTools protects your privacy and handles your data. All processing happens locally in your browser."
     >
       <div className="p-6 max-w-4xl mx-auto">
         <div className="prose prose-gray dark:prose-invert max-w-none">
@@ -45,15 +45,15 @@ export const PrivacyPolicy = () => {
             <p className="text-muted-foreground leading-relaxed">
               SecureTools is committed to protecting your privacy. We believe that your sensitive data should remain 
               private and secure. This privacy policy explains how we collect, use, and protect your 
-              information when you use our security tools with military-grade encryption.
+              information when you use our security tools with local browser processing.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-foreground mb-4">Data Processing Philosophy</h2>
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
-              <h3 className="font-semibold text-green-700 dark:text-green-300 mb-2">🔒 Local Processing</h3>
-              <p className="text-green-600 dark:text-green-400 text-sm">
+            <div className="rounded-lg border surface-success p-4 mb-4">
+              <h3 className="font-semibold text-success mb-2">🔒 Local Processing</h3>
+              <p className="text-success/90 text-sm">
                 All data processing happens locally in your browser. Your sensitive data never leaves your device 
                 and is never sent to our servers.
               </p>
@@ -162,9 +162,9 @@ export const PrivacyPolicy = () => {
             </div>
           </section>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-8">
-            <h3 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">💡 Privacy-First Design</h3>
-            <p className="text-blue-600 dark:text-blue-400 text-sm">
+          <div className="rounded-lg border surface-info p-4 mt-8">
+            <h3 className="font-semibold text-info mb-2">💡 Privacy-First Design</h3>
+            <p className="text-info/90 text-sm">
               SecureTools was designed with privacy in mind. Your sensitive data never leaves your device, 
               ensuring maximum security and privacy for all your security and utility work.
             </p>

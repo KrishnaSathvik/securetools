@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Security tools pages
+# Security tools
 Allow: /password-generator
 Allow: /text-encryptor
 Allow: /security-headers-checker
@@ -14,16 +14,12 @@ Allow: /blog
 Allow: /about
 Allow: /faq
 Allow: /comparisons
-Allow: /privacy-policy
-Allow: /terms-of-service
+Allow: /privacy
+Allow: /terms
 
-# Disallow admin and private areas
+# Disallow non-public paths
 Disallow: /admin/
 Disallow: /private/
 Disallow: /api/
 
-# Sitemap
 Sitemap: https://www.securetools.dev/sitemap.xml
-
-# Security-focused crawling
-Crawl-delay: 1

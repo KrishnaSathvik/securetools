@@ -15,7 +15,7 @@
 - 📱 **Mobile Friendly** - Responsive design for all devices
 - 🎨 **Modern UI** - Clean, intuitive interface with dark/light themes
 - 🆓 **Completely Free** - No usage limits or hidden costs
-- 🔐 **Military-Grade Security** - AES-256-GCM encryption and Web Crypto API
+- 🔐 **Browser Crypto** - AES-256-GCM encryption via Web Crypto API where applicable
 - 📊 **Real-time Analytics** - Built-in performance monitoring
 - 🛡️ **Security Focused** - All tools designed with security best practices
 
@@ -44,27 +44,22 @@ Encrypt and decrypt text using various encryption algorithms with client-side pr
 - File encryption support
 - Multiple encryption modes
 
-### 3. Security Headers Checker
-Analyze website security headers, SSL/TLS certificates, and perform vulnerability assessments.
+### 3. Security Headers Checker (Demo)
+Educational demo that explains common HTTP security headers. Does **not** perform live remote scanning from the browser (CORS prevents that without a backend).
 
 **Features:**
-- Comprehensive security header analysis
-- SSL/TLS certificate validation
-- Vulnerability assessment
-- Security recommendations
-- Real-time header checking
-- Detailed security reports
+- Explains HSTS, CSP, X-Frame-Options, and related headers
+- Simulated sample results for learning
+- Recommendations for each header type
 
 ### 4. Two-Factor Authentication Generator
-Generate TOTP codes, QR codes for authenticator apps, and backup codes.
+Generate RFC 6238 TOTP codes, scannable otpauth QR codes, and backup codes locally in your browser.
 
 **Features:**
-- TOTP code generation
-- QR code generation for authenticator apps
+- TOTP code generation (RFC 6238 via otplib)
+- QR code for authenticator apps
 - Backup code generation
-- Multiple authenticator app support
-- Time-based synchronization
-- Secure key generation
+- CSPRNG secret generation
 
 ### 5. Random Data Generator
 Generate secure random strings, API keys, tokens, and cryptographic data.
@@ -78,14 +73,13 @@ Generate secure random strings, API keys, tokens, and cryptographic data.
 - Multiple output formats
 
 ### 6. Password Strength Analyzer
-Analyze password strength, detect common patterns, and provide security recommendations.
+Analyze password strength, detect common patterns, and provide recommendations. Local analysis only — no live breach database lookup.
 
 **Features:**
 - Password strength scoring
 - Pattern detection
-- Breach checking simulation
-- Security recommendations
 - Entropy calculation
+- Security recommendations
 - Common password detection
 
 
@@ -164,7 +158,7 @@ securetools/
 │   │   ├── analytics.ts  # Analytics configuration
 │   │   └── ...           # Other utilities
 │   ├── pages/            # Page components
-│   │   ├── tools/        # Individual tool pages (21 tools)
+│   │   ├── tools/        # Six security tool pages
 │   │   ├── Index.tsx     # Homepage
 │   │   ├── About.tsx     # About page
 │   │   ├── Blog.tsx      # Blog with security articles

@@ -12,8 +12,11 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Copy, RefreshCw, Download, Shield, Clock, Eye, EyeOff, Key, Zap, Lock, Target, CheckCircle } from 'lucide-react';
+import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
+import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
+import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
 import { trackTextProcessing, trackInteraction, trackToolUsage, trackPasswordGeneration, trackConversion } from '@/lib/analytics';
 
 // EFF Diceware word list (first 100 words for demo)
@@ -55,8 +58,13 @@ const PasswordGenerator = () => {
   useSEO({
     title: 'Password & Passphrase Generator - SecureTools',
     description: 'Generate cryptographically secure passwords and memorable passphrases with entropy analysis, Diceware support, and printable cards.',
-    keywords: 'password generator, passphrase generator, diceware, entropy, cspng, security, printable passwords',
-    canonical: 'https://www.securetools.dev/password-generator'
+    keywords: 'password generator, passphrase generator, diceware, entropy, security, printable passwords',
+    canonical: 'https://www.securetools.dev/password-generator',
+    structuredData: buildWebApplicationSchema({
+      name: 'Password & Passphrase Generator',
+      description: 'Generate secure passwords and passphrases in your browser.',
+      path: '/password-generator',
+    }),
   });
 
   // Load password history from localStorage
@@ -155,9 +163,10 @@ const PasswordGenerator = () => {
   // Generate Diceware passphrase
   const generatePassphrase = () => {
     const words = [];
+    const random = new Uint32Array(wordCount);
+    crypto.getRandomValues(random);
     for (let i = 0; i < wordCount; i++) {
-      const randomIndex = Math.floor(Math.random() * dicewareWords.length);
-      words.push(dicewareWords[randomIndex]);
+      words.push(dicewareWords[random[i] % dicewareWords.length]);
     }
     const newPassphrase = words.join(' ');
     setPassphrase(newPassphrase);
@@ -172,10 +181,20 @@ const PasswordGenerator = () => {
 
   // Generate mnemonic password
   const generateMnemonic = () => {
-    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const animal = animals[Math.floor(Math.random() * animals.length)];
-    const number = Math.floor(Math.random() * 1000);
-    const symbol = '!@#$%^&*'[Math.floor(Math.random() * 8)];
+    const pick = (list: string[]) => {
+      const n = new Uint32Array(1);
+      crypto.getRandomValues(n);
+      return list[n[0] % list.length];
+    };
+    const adj = pick(adjectives);
+    const animal = pick(animals);
+    const numBytes = new Uint32Array(1);
+    crypto.getRandomValues(numBytes);
+    const number = numBytes[0] % 1000;
+    const symbolChars = '!@#$%^&*';
+    const symBytes = new Uint32Array(1);
+    crypto.getRandomValues(symBytes);
+    const symbol = symbolChars[symBytes[0] % symbolChars.length];
     
     const newMnemonic = `${adj}${animal}${number}${symbol}`;
     setMnemonic(newMnemonic);
@@ -217,10 +236,10 @@ const PasswordGenerator = () => {
   };
 
   const getStrengthColor = (strength: number) => {
-    if (strength < 30) return 'text-red-500';
-    if (strength < 60) return 'text-yellow-500';
-    if (strength < 80) return 'text-orange-500';
-    return 'text-green-500';
+    if (strength < 30) return 'text-destructive';
+    if (strength < 60) return 'text-warning';
+    if (strength < 80) return 'text-info';
+    return 'text-success';
   };
 
   const getStrengthLabel = (strength: number) => {
@@ -230,21 +249,37 @@ const PasswordGenerator = () => {
     return 'Strong';
   };
 
+  const toolTrust = {
+    badges: [
+      { label: 'CSPRNG', variant: 'csprng' as const },
+      { label: 'Local', variant: 'local' as const },
+      { label: 'Passphrases', variant: 'passphrases' as const },
+    ],
+    callouts: [
+      {
+        variant: 'info' as const,
+        content: (
+          <>
+            <strong>Security note:</strong> Passwords use cryptographically secure randomness via the Web Crypto API.
+            Generated values stay in your browser and are not sent to our servers.
+          </>
+        ),
+      },
+    ],
+    howItWorks:
+      'Passwords and passphrases are generated locally in your browser using the Web Crypto API for cryptographically secure randomness.',
+    limitations:
+      'Copy generated passwords into a password manager. Avoid storing sensitive passwords in shared browsers or password history on untrusted devices.',
+    privacyNote:
+      "Generated passwords are not sent to SecureTools servers. Optional password history is stored only in your browser's local storage if you use that feature.",
+  };
+
   return (
     <ToolLayout
       title="Password & Passphrase Generator"
       description="Generate cryptographically secure passwords and memorable passphrases with entropy analysis, Diceware support, and printable cards."
     >
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Security Alert */}
-        <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200">
-          <Shield className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Security Note:</strong> All password generation uses cryptographically secure random number generation. 
-            Generated passwords are processed locally in your browser and never transmitted to our servers.
-          </AlertDescription>
-        </Alert>
-
         <Tabs defaultValue="password" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="password">Random Password</TabsTrigger>
@@ -347,7 +382,7 @@ const PasswordGenerator = () => {
               </Card>
 
               {/* Generated Password */}
-              <Card>
+              <Card className="tool-output-highlight">
                 <CardHeader>
                   <CardTitle>Generated Password</CardTitle>
                   <CardDescription>
@@ -606,7 +641,7 @@ const PasswordGenerator = () => {
             <CardHeader>
               <CardTitle>Recent Passwords</CardTitle>
               <CardDescription>
-                Your last 5 generated passwords (stored locally)
+                Your last 5 generated passwords (stored locally). Password history is stored only in this browser. Avoid using history on shared or untrusted devices.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -628,125 +663,96 @@ const PasswordGenerator = () => {
           </Card>
         )}
 
-        {/* Why Use + Key Features */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Why Use Password Generator?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Secure Password Creation</p>
-                  <p className="text-sm text-muted-foreground">Generate cryptographically secure passwords that are virtually impossible to crack using brute force attacks.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Memorable Passphrases</p>
-                  <p className="text-sm text-muted-foreground">Create Diceware passphrases using the EFF word list for easy-to-remember yet secure passwords.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Entropy Analysis</p>
-                  <p className="text-sm text-muted-foreground">Get real-time entropy calculations and crack time estimates to understand password strength.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Customizable Options</p>
-                  <p className="text-sm text-muted-foreground">Control character sets, length, and exclusion rules to meet specific security requirements.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <ToolTrustSection {...toolTrust} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Key Features
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Web Crypto API for secure randomness</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Diceware passphrase generation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Real-time entropy calculation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Crack time estimation</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Mnemonic password patterns</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Password history (local storage)</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Privacy-focused (all processing in browser)</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Security Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Cryptographic Security</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• Uses Web Crypto API for secure randomness</li>
-                  <li>• Cryptographically secure random number generation</li>
-                  <li>• Entropy calculations for strength assessment</li>
-                  <li>• Military-grade security standards</li>
+        <ToolDetailsAccordion
+          sections={[
+            buildTrustDetailsAccordionSection(toolTrust),
+            {
+              id: 'why-use',
+              title: 'Why use this tool',
+              content: (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Secure password creation</p>
+                      <p>Generate random passwords with CSPRNG-backed randomness for everyday account use.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Memorable passphrases</p>
+                      <p>Create Diceware passphrases using the EFF word list for easier recall.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Entropy analysis</p>
+                      <p>See entropy estimates and rough crack-time figures to compare options — not guarantees.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden />
+                    <div>
+                      <p className="font-medium text-foreground">Customizable options</p>
+                      <p>Control character sets, length, and exclusion rules for your workflow.</p>
+                    </div>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              id: 'key-features',
+              title: 'Key features',
+              content: (
+                <ul className="space-y-2 list-disc pl-5">
+                  <li>Web Crypto API for secure randomness</li>
+                  <li>Diceware passphrase generation</li>
+                  <li>Real-time entropy calculation</li>
+                  <li>Approximate crack-time estimation</li>
+                  <li>Mnemonic password patterns</li>
+                  <li>Password history (local storage only)</li>
+                  <li>Privacy-focused — all processing in browser</li>
                 </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Password Types</h4>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• <strong>Random:</strong> Cryptographically secure passwords</li>
-                  <li>• <strong>Diceware:</strong> EFF word list for memorability</li>
-                  <li>• <strong>Mnemonic:</strong> Adjective-Animal-Number format</li>
-                  <li>• <strong>Customizable:</strong> Character sets and length</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Badge variant="secondary">Web Crypto API</Badge>
-              <Badge variant="secondary">CSPRNG</Badge>
-              <Badge variant="secondary">Diceware</Badge>
-              <Badge variant="secondary">Entropy Analysis</Badge>
-            </div>
-          </CardContent>
-        </Card>
+              ),
+            },
+            {
+              id: 'security-info',
+              title: 'Security information',
+              content: (
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Cryptographic security</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li>Uses Web Crypto API for secure randomness</li>
+                      <li>Cryptographically secure random number generation</li>
+                      <li>Entropy calculations for strength assessment</li>
+                      <li>Industry-standard cryptographic randomness via Web Crypto API</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Password types</h4>
+                    <ul className="space-y-1 list-disc pl-5">
+                      <li><strong>Random:</strong> CSPRNG-backed passwords</li>
+                      <li><strong>Diceware:</strong> EFF word list for memorability</li>
+                      <li><strong>Mnemonic:</strong> Adjective-Animal-Number format</li>
+                      <li><strong>Customizable:</strong> Character sets and length</li>
+                    </ul>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">Web Crypto API</Badge>
+                    <Badge variant="secondary">CSPRNG</Badge>
+                    <Badge variant="secondary">Diceware</Badge>
+                    <Badge variant="secondary">Entropy Analysis</Badge>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+        />
       </div>
     </ToolLayout>
   );

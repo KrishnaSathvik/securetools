@@ -1,99 +1,50 @@
 // Service Worker for SecureTools
-// Provides offline functionality and caching
-
-const CACHE_NAME = 'securetools-v1';
+const CACHE_NAME = 'securetools-v2';
 const urlsToCache = [
   '/',
-  '/word-counter',
-  '/case-converter',
-  '/line-breaks',
-  '/diff-checker',
-  '/lorem-ipsum',
+  '/password-generator',
+  '/text-encryptor',
+  '/security-headers-checker',
+  '/two-factor-auth',
+  '/random-data-generator',
+  '/password-strength-analyzer',
   '/about',
   '/privacy',
   '/terms',
   '/faq',
   '/blog',
   '/comparisons',
-  '/offline.html'
+  '/offline.html',
 ];
 
-// Install event - cache resources
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch((error) => {
-        console.log('Cache install failed:', error);
-      })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)).catch(() => undefined)
   );
 });
 
-// Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
+    caches.match(event.request).then((response) => {
+      if (response) return response;
+      return fetch(event.request).catch(() => {
+        if (event.request.destination === 'document') {
+          return caches.match('/offline.html');
         }
-        
-        return fetch(event.request)
-          .then((response) => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(() => {
-            // If both cache and network fail, show offline page
-            if (event.request.destination === 'document') {
-              return caches.match('/offline.html');
-            }
-            // Return a basic response for non-document requests
-            return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-          });
-      })
-      .catch(() => {
-        // If cache match fails, try to fetch from network
-        return fetch(event.request)
-          .catch(() => {
-            // If all else fails, show offline page for documents
-            if (event.request.destination === 'document') {
-              return caches.match('/offline.html');
-            }
-            return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-          });
-      })
+        return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+      });
+    })
   );
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+          if (cacheName !== CACHE_NAME) return caches.delete(cacheName);
         })
-      );
-    })
+      )
+    )
   );
 });
