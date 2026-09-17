@@ -1,0 +1,33 @@
+# SecureTools
+
+> SecureTools provides free, privacy-first browser-based security tools.
+> Tools run locally in the user's browser and include password generation,
+> text encryption, TOTP helpers, random data generation, password strength
+> analysis, and an educational security-headers demo.
+
+## Tools
+
+- [Password & Passphrase Generator](https://www.securetools.dev/password-generator): Generate random passwords, Diceware passphrases, and mnemonic passwords locally in the browser.
+- [Text Encryptor/Decryptor](https://www.securetools.dev/text-encryptor): Encrypt and decrypt text with AES-GCM, plus Base64, URL encoding, and ROT13.
+- [Security Headers Checker (Demo)](https://www.securetools.dev/security-headers-checker): Learn common HTTP security headers with simulated examples — not live remote scanning.
+- [Two-Factor Authentication Generator](https://www.securetools.dev/two-factor-auth): Generate TOTP codes, QR setup data, and backup codes locally for testing and learning.
+- [Random Data Generator](https://www.securetools.dev/random-data-generator): Create random strings, UUIDs, bytes, and numbers locally for testing and development.
+- [Password Strength Analyzer](https://www.securetools.dev/password-strength-analyzer): Review password length, patterns, and approximate strength locally — no breach lookup.
+
+## Guides
+
+- [Security Guides](https://www.securetools.dev/blog): Practical references for passwords, encryption, TOTP, headers, and local security tooling.
+- [Browser Security Tools, Honestly Explained](https://www.securetools.dev/blog/browser-security-tools-honestly-explained): What these browser tools can and cannot do, including demo and local-processing limits.
+- [Password Strength Analysis Without a Breach Database](https://www.securetools.dev/blog/password-strength-analysis-without-breach-database): How local pattern and entropy checks differ from live breach lookups.
+- [What the Text Encryptor Does](https://www.securetools.dev/blog/what-securetools-text-encryptor-does): AES-GCM encryption versus encoding modes, and what stays in the browser.
+
+## About
+
+- [About SecureTools](https://www.securetools.dev/about)
+- [Privacy](https://www.securetools.dev/privacy)
+- [FAQ](https://www.securetools.dev/faq)
+
+## Related sites
+
+- [ByteToolBox](https://www.bytetoolbox.com/): Developer tools for JSON, Base64, hashes, UUIDs, regex, and timestamps.
+- [TextCraft](https://www.textcraft.dev/): Browser tools for counting, cleaning, converting, comparing, and organizing text.

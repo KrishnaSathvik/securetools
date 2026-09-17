@@ -1,10 +1,42 @@
+import { getTool, type ToolDefinition, type ToolFaq } from '@/data/tools';
+
 const SITE_URL = 'https://www.securetools.dev';
 const SITE_NAME = 'SecureTools';
+const SITE_DESCRIPTION =
+  'Browser-based security and privacy tools that run locally in your browser';
 
 export interface WebApplicationSchemaOptions {
   name: string;
   description: string;
   path: string;
+}
+
+function asGraphNode(schema: Record<string, unknown>): Record<string, unknown> {
+  const { ['@context']: _context, ...node } = schema;
+  return node;
+}
+
+export function buildOrganizationSchema(): Record<string, unknown> {
+  return {
+    '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+  };
+}
+
+export function buildWebSiteSchema(): Record<string, unknown> {
+  return {
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    publisher: {
+      '@id': `${SITE_URL}/#organization`,
+    },
+  };
 }
 
 export function buildWebApplicationSchema({
@@ -17,7 +49,7 @@ export function buildWebApplicationSchema({
     '@type': 'WebApplication',
     name,
     description,
-    url: `${SITE_URL}${path}`,
+    url: path === '/' ? SITE_URL : `${SITE_URL}${path}`,
     applicationCategory: 'SecurityApplication',
     operatingSystem: 'Web Browser',
     browserRequirements: 'Requires JavaScript',
@@ -31,6 +63,47 @@ export function buildWebApplicationSchema({
       name: SITE_NAME,
       url: SITE_URL,
     },
+  };
+}
+
+export function buildHomepageStructuredData(): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      buildOrganizationSchema(),
+      buildWebSiteSchema(),
+      {
+        ...asGraphNode(
+          buildWebApplicationSchema({
+            name: SITE_NAME,
+            description: SITE_DESCRIPTION,
+            path: '/',
+          })
+        ),
+        '@id': `${SITE_URL}/#app`,
+        publisher: { '@id': `${SITE_URL}/#organization` },
+      },
+    ],
+  };
+}
+
+export function buildToolPageStructuredData(
+  path: string,
+  tool: ToolDefinition | undefined = getTool(path)
+): Record<string, unknown> {
+  const application = buildWebApplicationSchema({
+    name: tool?.name ?? 'SecureTools',
+    description: tool?.schemaDescription ?? SITE_DESCRIPTION,
+    path,
+  });
+
+  if (!tool?.faqs.length) {
+    return application;
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [asGraphNode(application), asGraphNode(buildFaqSchema(tool.faqs))],
   };
 }
 
@@ -75,10 +148,7 @@ export function buildArticleSchema({
   };
 }
 
-export interface FaqSchemaItem {
-  question: string;
-  answer: string;
-}
+export type FaqSchemaItem = ToolFaq;
 
 export function buildFaqSchema(faqs: FaqSchemaItem[]): Record<string, unknown> {
   return {
@@ -104,7 +174,7 @@ export function buildBlogStructuredData(
   }
   return {
     '@context': 'https://schema.org',
-    '@graph': [article, buildFaqSchema(faqs)],
+    '@graph': [asGraphNode(article), asGraphNode(buildFaqSchema(faqs))],
   };
 }
 

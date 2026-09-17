@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { ogImageForPath, OG_IMAGE_HEIGHT, OG_IMAGE_WIDTH } from '@/lib/seo/ogImages';
 
 interface SEOProps {
   title: string;
@@ -49,10 +50,12 @@ export const useSEO = ({
   keywords,
   canonical,
   structuredData,
-  ogImage = 'https://www.securetools.dev/og-image.png',
+  ogImage,
   ogType = 'website',
   twitterCard = 'summary_large_image'
 }: SEOProps) => {
+  const resolvedOgImage = ogImage ?? ogImageForPath(canonical);
+
   useEffect(() => {
     // Update document title
     const siteName = 'SecureTools';
@@ -75,7 +78,10 @@ export const useSEO = ({
     updateMetaTag('property', 'og:title', title);
     updateMetaTag('property', 'og:description', description);
     updateMetaTag('property', 'og:type', ogType);
-    updateMetaTag('property', 'og:image', ogImage);
+    updateMetaTag('property', 'og:image', resolvedOgImage);
+    updateMetaTag('property', 'og:image:width', String(OG_IMAGE_WIDTH));
+    updateMetaTag('property', 'og:image:height', String(OG_IMAGE_HEIGHT));
+    updateMetaTag('property', 'og:image:type', 'image/png');
     updateMetaTag('property', 'og:url', canonical || window.location.href);
     updateMetaTag('property', 'og:site_name', siteName);
 
@@ -83,7 +89,7 @@ export const useSEO = ({
     updateMetaTag('name', 'twitter:card', twitterCard);
     updateMetaTag('name', 'twitter:title', title);
     updateMetaTag('name', 'twitter:description', description);
-    updateMetaTag('name', 'twitter:image', ogImage);
+    updateMetaTag('name', 'twitter:image', resolvedOgImage);
 
     // Add structured data
     if (structuredData) {
@@ -94,7 +100,7 @@ export const useSEO = ({
     return () => {
       removeStructuredData();
     };
-  }, [title, description, keywords, canonical, structuredData, ogImage, ogType, twitterCard]);
+  }, [title, description, keywords, canonical, structuredData, resolvedOgImage, ogType, twitterCard]);
 };
 
 /**

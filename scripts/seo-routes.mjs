@@ -21,7 +21,7 @@ const STATIC_ROUTES = [
   { path: '/password-strength-analyzer', mustContain: ['Password Strength Analyzer', 'does not check breach databases'] },
   { path: '/blog', mustContain: ['SecureTools Blog', 'Start here'] },
   { path: '/faq', mustContain: ['Frequently Asked Questions', 'What is SecureTools'] },
-  { path: '/about', mustContain: ['About SecureTools', 'Our Mission'] },
+  { path: '/about', mustContain: ['About SecureTools', 'Our Mission', 'Also check', 'ByteToolBox', 'TextCraft'] },
   { path: '/comparisons', mustContain: ['SecureTools vs Competitors'] },
   { path: '/privacy', mustContain: ['Privacy Policy'] },
   { path: '/terms', mustContain: ['Terms of Service'] },
@@ -42,6 +42,19 @@ export function getAllPrerenderRoutes() {
     mustContain: [post.title, 'Back to blog'],
   }));
   return [...STATIC_ROUTES, ...blogRouteEntries];
+}
+
+function ogImageFor(path) {
+  const SITE_URL = 'https://www.securetools.dev';
+  const toolImages = {
+    '/password-generator': `${SITE_URL}/og/password-generator.png`,
+    '/text-encryptor': `${SITE_URL}/og/text-encryptor.png`,
+    '/security-headers-checker': `${SITE_URL}/og/security-headers-checker.png`,
+    '/two-factor-auth': `${SITE_URL}/og/two-factor-auth.png`,
+    '/random-data-generator': `${SITE_URL}/og/random-data-generator.png`,
+    '/password-strength-analyzer': `${SITE_URL}/og/password-strength-analyzer.png`,
+  };
+  return toolImages[path] ?? `${SITE_URL}/og-image.png`;
 }
 
 /** Route meta for generate-route-html.mjs (kept in sync with src/seo/routeMeta.ts). */
@@ -151,10 +164,12 @@ export function getRouteMetaList() {
   return staticMeta.map((route) => ({
     ...route,
     canonical: route.path === '/' ? SITE_URL : `${SITE_URL}${route.path}`,
+    ogImage: ogImageFor(route.path),
   })).concat(
     blogMeta.map((route) => ({
       ...route,
       canonical: `${SITE_URL}${route.path}`,
+      ogImage: ogImageFor(route.path),
     }))
   );
 }

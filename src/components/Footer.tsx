@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { ExternalLink } from 'lucide-react';
+import { SISTER_SITES } from '@/lib/sisterSites';
 
 const footerLinks = [
   { name: 'About', path: '/about' },
@@ -35,6 +37,32 @@ export const Footer = () => {
             </p>
           </div>
         </div>
+
+        <nav
+          aria-label="Related sites"
+          className="mt-6 pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+        >
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground text-center sm:text-left shrink-0">
+            Also check
+          </p>
+          <ul className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-3">
+            {SISTER_SITES.map((site) => (
+              <li key={site.url}>
+                <a
+                  href={site.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary/40 px-3 py-1.5 text-sm text-foreground hover:bg-secondary hover:border-primary/30 transition-colors"
+                >
+                  <span className="font-medium">{site.name}</span>
+                  <span className="text-muted-foreground hidden sm:inline">· {site.shortLabel}</span>
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" aria-hidden="true" />
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </footer>
   );

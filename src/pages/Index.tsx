@@ -5,8 +5,9 @@ import { Search, Zap, Shield, Clock, Copy, BookOpen, ArrowRight } from 'lucide-r
 import { useSEO } from '@/hooks/useSEO';
 import { getBlogPostBySlug } from '@/data/blogPosts';
 import type { BlogPost } from '@/data/blog/types';
-import { getBlogTool } from '@/data/blog/toolCatalog';
+import { getBlogTool, TOOLS } from '@/data/blog/toolCatalog';
 import { getCategoryLabel } from '@/lib/blogCategories';
+import { buildHomepageStructuredData } from '@/lib/seo/structuredData';
 
 const HOMEPAGE_BLOG_SLUGS = [
   'browser-security-tools-honestly-explained',
@@ -19,56 +20,7 @@ const homepageBlogPosts = HOMEPAGE_BLOG_SLUGS.map((slug) => getBlogPostBySlug(sl
   (post): post is NonNullable<typeof post> => Boolean(post)
 );
 
-const tools = [
-  {
-    name: 'Password & Passphrase Generator',
-    path: '/password-generator',
-    description: 'Generate random passwords, Diceware passphrases, and mnemonic passwords locally in your browser.',
-    badge: 'CSPRNG',
-    guideSlug: 'password-security-guide',
-    keywords: ['password', 'passphrase', 'diceware', 'entropy', 'security', 'cspng'],
-  },
-  {
-    name: 'Text Encryptor/Decryptor',
-    path: '/text-encryptor',
-    description: 'Encrypt text with AES-GCM or use encoding modes like Base64 and URL encoding.',
-    badge: 'AES-GCM',
-    guideSlug: 'what-securetools-text-encryptor-does',
-    keywords: ['encryption', 'decryption', 'aes', 'cipher', 'security', 'cryptography'],
-  },
-  {
-    name: 'Security Headers Checker (Demo)',
-    path: '/security-headers-checker',
-    description: 'Learn common HTTP security headers with simulated examples — not live remote scanning.',
-    badge: 'Demo',
-    guideSlug: 'security-headers-checker-demo-explained',
-    keywords: ['security', 'headers', 'ssl', 'tls', 'vulnerability', 'analysis', 'demo'],
-  },
-  {
-    name: 'Two-Factor Authentication Generator',
-    path: '/two-factor-auth',
-    description: 'Generate TOTP codes, QR setup data, and backup codes locally for testing and learning.',
-    badge: 'TOTP',
-    guideSlug: 'totp-secrets-qr-codes-safety-guide',
-    keywords: ['2fa', 'totp', 'authenticator', 'qr code', 'security', 'mfa'],
-  },
-  {
-    name: 'Random Data Generator',
-    path: '/random-data-generator',
-    description: 'Create random strings, UUIDs, bytes, and numbers for testing, examples, and development workflows.',
-    badge: 'Local',
-    guideSlug: 'generate-api-keys-and-random-tokens-browser',
-    keywords: ['random', 'generator', 'api key', 'token', 'cryptographic', 'secure'],
-  },
-  {
-    name: 'Password Strength Analyzer',
-    path: '/password-strength-analyzer',
-    description: 'Review password length, patterns, and approximate strength locally — no breach lookup.',
-    badge: 'No breach DB',
-    guideSlug: 'password-strength-analysis-without-breach-database',
-    keywords: ['password', 'strength', 'analyzer', 'security', 'entropy', 'patterns'],
-  },
-] as const;
+const tools = TOOLS;
 
 const features = [
   {
@@ -142,20 +94,7 @@ const Index = () => {
     keywords:
       'security tools, password generator, text encryptor, security headers, 2FA generator, random data generator, password analyzer, browser security tools, free security utilities',
     canonical: 'https://www.securetools.dev',
-    structuredData: {
-      '@context': 'https://schema.org',
-      '@type': 'WebApplication',
-      name: 'SecureTools',
-      description: 'Browser-based security and privacy tools that run locally in your browser',
-      url: 'https://www.securetools.dev',
-      applicationCategory: 'Security Tools',
-      operatingSystem: 'Web Browser',
-      offers: {
-        '@type': 'Offer',
-        price: '0',
-        priceCurrency: 'USD',
-      },
-    },
+    structuredData: buildHomepageStructuredData(),
   });
 
   const filteredTools = tools.filter(

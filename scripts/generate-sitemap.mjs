@@ -1,55 +1,140 @@
 /**
- * Regenerate public/sitemap.xml from known routes and blog posts.
+ * Regenerate public/sitemap.xml, robots.txt, and llms.txt from the site catalog.
  */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  ALLOW_TRAINING_CRAWLERS,
+  LLMS_ABOUT,
+  LLMS_GUIDES,
+  RELATED_SITES,
+  SEARCH_CRAWLERS,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+  STATIC_PAGES,
+  TOOLS,
+  TRAINING_CRAWLERS,
+} from './site-catalog.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const blogRoutesPath = path.join(__dirname, 'blog-routes.json');
-const sitemapPath = path.join(root, 'public', 'sitemap.xml');
-
-const SITE_URL = 'https://www.securetools.dev';
+const publicDir = path.join(root, 'public');
 const lastmod = new Date().toISOString().slice(0, 10);
-
-const staticRoutes = [
-  { loc: '/', priority: '1.0', changefreq: 'weekly' },
-  { loc: '/password-generator', priority: '0.9', changefreq: 'weekly' },
-  { loc: '/text-encryptor', priority: '0.9', changefreq: 'weekly' },
-  { loc: '/security-headers-checker', priority: '0.8', changefreq: 'weekly' },
-  { loc: '/two-factor-auth', priority: '0.9', changefreq: 'weekly' },
-  { loc: '/random-data-generator', priority: '0.9', changefreq: 'weekly' },
-  { loc: '/password-strength-analyzer', priority: '0.9', changefreq: 'weekly' },
-  { loc: '/blog', priority: '0.8', changefreq: 'weekly' },
-  { loc: '/faq', priority: '0.7', changefreq: 'monthly' },
-  { loc: '/about', priority: '0.7', changefreq: 'monthly' },
-  { loc: '/comparisons', priority: '0.7', changefreq: 'monthly' },
-  { loc: '/privacy', priority: '0.5', changefreq: 'yearly' },
-  { loc: '/terms', priority: '0.5', changefreq: 'yearly' },
-];
 
 const blogRoutes = fs.existsSync(blogRoutesPath)
   ? JSON.parse(fs.readFileSync(blogRoutesPath, 'utf8'))
   : [];
 
-const urlEntry = (loc, priority, changefreq) => `  <url>
-    <loc>${SITE_URL}${loc}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-  </url>`;
-
-const urls = [
-  ...staticRoutes.map((r) => urlEntry(r.loc, r.priority, r.changefreq)),
-  ...blogRoutes.map((post) => urlEntry(`/blog/${post.slug}`, '0.7', 'monthly')),
+const allPages = [
+  ...STATIC_PAGES.map((page) => ({
+    loc: page.path,
+    changefreq: page.changefreq,
+    priority: page.priority,
+  })),
+  ...blogRoutes.map((post) => ({
+    loc: `/blog/${post.slug}`,
+    changefreq: 'monthly',
+    priority: '0.7',
+  })),
 ];
 
-const xml = `<?xml version="1.0" encoding="UTF-8"?>
+export function buildSitemapXml(pages = allPages, modified = lastmod) {
+  const urls = pages
+    .map(
+      (page) => `  <url>
+    <loc>${SITE_URL}${page.loc}</loc>
+    <lastmod>${modified}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`
+    )
+    .join('\n\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.join('\n\n')}
+${urls}
 </urlset>
 `;
+}
 
-fs.writeFileSync(sitemapPath, xml);
-console.log(`Wrote sitemap with ${staticRoutes.length + blogRoutes.length} URLs`);
+export function buildRobotsTxt({ allowTraining = ALLOW_TRAINING_CRAWLERS } = {}) {
+  const directive = (allow) => (allow ? 'Allow: /' : 'Disallow: /');
+  const blocks = (agents, allow) =>
+    agents.map((agent) => `User-agent: ${agent}\n${directive(allow)}`).join('\n\n');
+  const trainingPolicy = allowTraining ? 'allow' : 'disallow';
+
+  return `# ${SITE_NAME}
+# ${SITE_URL}
+
+User-agent: *
+Allow: /
+
+# Search and discovery
+${blocks(SEARCH_CRAWLERS, true)}
+
+# Training — separate from search. Currently: ${trainingPolicy}
+${blocks(TRAINING_CRAWLERS, allowTraining)}
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+}
+
+export function buildLlmsTxt() {
+  const toolsList = TOOLS.map(
+    (tool) => `- [${tool.name}](${SITE_URL}${tool.path}): ${tool.llmsDescription}`
+  ).join('\n');
+
+  const guidesList = LLMS_GUIDES.map(
+    (guide) => `- [${guide.name}](${SITE_URL}${guide.path}): ${guide.description}`
+  ).join('\n');
+
+  const aboutList = LLMS_ABOUT.map(
+    (page) => `- [${page.name}](${SITE_URL}${page.path})`
+  ).join('\n');
+
+  const relatedList = RELATED_SITES.map(
+    (site) => `- [${site.name}](${site.url}): ${site.description}`
+  ).join('\n');
+
+  const summary = SITE_DESCRIPTION.trim().split('\n').join('\n> ');
+
+  return `# ${SITE_NAME}
+
+> ${summary}
+
+## Tools
+
+${toolsList}
+
+## Guides
+
+${guidesList}
+
+## About
+
+${aboutList}
+
+## Related sites
+
+${relatedList}
+`;
+}
+
+function writeDiscoveryFiles() {
+  fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), buildSitemapXml());
+  fs.writeFileSync(path.join(publicDir, 'robots.txt'), buildRobotsTxt());
+  fs.writeFileSync(path.join(publicDir, 'llms.txt'), buildLlmsTxt());
+  console.log(
+    `Generated discovery files: sitemap (${allPages.length} URLs), robots.txt, llms.txt`
+  );
+}
+
+const isDirectRun =
+  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
+  writeDiscoveryFiles();
+}

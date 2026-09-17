@@ -11,9 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Copy, Lock, Unlock, Eye, EyeOff, AlertCircle, CheckCircle, Target, Zap } from 'lucide-react';
 import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
 import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
+import { ToolDiscoverySection } from '@/components/ToolDiscoverySection';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
-import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
+import { buildToolPageStructuredData } from '@/lib/seo/structuredData';
 import { trackTextProcessing, trackInteraction, trackTextEncryption, trackConversion } from '@/lib/analytics';
 
 /**
@@ -43,11 +44,7 @@ export default function TextEncryptor() {
     description: 'Encrypt and decrypt text with AES-256 encryption, Base64 encoding, URL encoding, and ROT13 cipher. Secure text encryption tool that runs entirely in your browser.',
     keywords: 'text encryptor, text decryptor, AES encryption, Base64 encoding, URL encoding, ROT13 cipher, cryptography, security tools',
     canonical: 'https://www.securetools.dev/text-encryptor',
-    structuredData: buildWebApplicationSchema({
-      name: 'Text Encryptor/Decryptor',
-      description: 'Browser-based AES-256-GCM encryption and encoding utilities.',
-      path: '/text-encryptor',
-    }),
+    structuredData: buildToolPageStructuredData('/text-encryptor'),
   });
 
   // AES-256 Encryption/Decryption
@@ -583,6 +580,8 @@ export default function TextEncryptor() {
             },
           ]}
         />
+
+        <ToolDiscoverySection path="/text-encryptor" />
       </div>
     </ToolLayout>
   );

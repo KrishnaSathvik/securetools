@@ -27,7 +27,7 @@ import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/component
 import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
-import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
+import { buildToolPageStructuredData } from '@/lib/seo/structuredData';
 import {
   generateTotpSecret,
   generateTotpCode,
@@ -60,11 +60,7 @@ export default function TwoFactorAuth() {
       'Generate RFC 6238 TOTP codes, scannable otpauth QR codes, and backup codes locally in your browser.',
     keywords: '2FA generator, TOTP generator, QR code, authenticator app, two factor authentication, backup codes, security',
     canonical: 'https://www.securetools.dev/two-factor-auth',
-    structuredData: buildWebApplicationSchema({
-      name: 'Two-Factor Authentication Generator',
-      description: 'Browser-based RFC 6238 TOTP and QR setup helper.',
-      path: '/two-factor-auth',
-    }),
+    structuredData: buildToolPageStructuredData('/two-factor-auth'),
   });
 
   const generateSecret = useCallback(() => {

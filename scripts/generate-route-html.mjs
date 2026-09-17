@@ -24,7 +24,7 @@ function injectSeoFallback(html, { title, description }) {
   return html.replace('</body>', `${block}\n  </body>`);
 }
 
-function injectMeta(html, { title, description, keywords, canonical }) {
+function injectMeta(html, { title, description, keywords, canonical, ogImage }) {
   let out = html;
   const esc = (s) => s.replace(/"/g, '&quot;');
   out = out.replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`);
@@ -48,6 +48,16 @@ function injectMeta(html, { title, description, keywords, canonical }) {
     `<meta property="og:description" content="${esc(description)}"`
   );
   out = out.replace(/<meta property="og:url" content="[^"]*"/, `<meta property="og:url" content="${canonical}"`);
+  if (ogImage) {
+    out = out.replace(
+      /<meta property="og:image" content="[^"]*"/,
+      `<meta property="og:image" content="${ogImage}"`
+    );
+    out = out.replace(
+      /<meta name="twitter:image" content="[^"]*"/,
+      `<meta name="twitter:image" content="${ogImage}"`
+    );
+  }
   out = out.replace(
     /<meta name="twitter:title" content="[^"]*"/,
     `<meta name="twitter:title" content="${esc(title)}"`

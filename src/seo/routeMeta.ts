@@ -1,4 +1,4 @@
-import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
+import { buildHomepageStructuredData, buildToolPageStructuredData } from '@/lib/seo/structuredData';
 import { blogPosts } from '@/data/blogPosts';
 
 export interface RouteMeta {
@@ -20,11 +20,7 @@ const toolRoutes: RouteMeta[] = [
       'Generate cryptographically secure passwords and memorable passphrases with entropy analysis and Diceware support. Runs entirely in your browser.',
     keywords: 'password generator, passphrase generator, diceware, entropy, security',
     canonical: `${SITE_URL}/password-generator`,
-    structuredData: buildWebApplicationSchema({
-      name: 'Password & Passphrase Generator',
-      description: 'Generate secure passwords and passphrases in your browser.',
-      path: '/password-generator',
-    }),
+    structuredData: buildToolPageStructuredData('/password-generator'),
   },
   {
     path: '/text-encryptor',
@@ -33,11 +29,7 @@ const toolRoutes: RouteMeta[] = [
       'Encrypt and decrypt text with AES-256-GCM, plus Base64, URL encoding, and ROT13. All processing happens locally in your browser.',
     keywords: 'text encryptor, AES encryption, Base64, URL encoding, ROT13',
     canonical: `${SITE_URL}/text-encryptor`,
-    structuredData: buildWebApplicationSchema({
-      name: 'Text Encryptor/Decryptor',
-      description: 'Browser-based text encryption and encoding utilities.',
-      path: '/text-encryptor',
-    }),
+    structuredData: buildToolPageStructuredData('/text-encryptor'),
   },
   {
     path: '/security-headers-checker',
@@ -46,11 +38,7 @@ const toolRoutes: RouteMeta[] = [
       'Educational demo that explains common HTTP security headers. Does not perform live remote scanning from the browser.',
     keywords: 'security headers, HSTS, CSP, X-Frame-Options, educational demo',
     canonical: `${SITE_URL}/security-headers-checker`,
-    structuredData: buildWebApplicationSchema({
-      name: 'Security Headers Checker (Demo)',
-      description: 'Educational security headers review demo for learning header purposes.',
-      path: '/security-headers-checker',
-    }),
+    structuredData: buildToolPageStructuredData('/security-headers-checker'),
   },
   {
     path: '/two-factor-auth',
@@ -59,11 +47,7 @@ const toolRoutes: RouteMeta[] = [
       'Generate RFC 6238 TOTP codes, otpauth QR codes, and backup codes locally in your browser.',
     keywords: '2FA generator, TOTP generator, QR code, authenticator app, backup codes',
     canonical: `${SITE_URL}/two-factor-auth`,
-    structuredData: buildWebApplicationSchema({
-      name: 'Two-Factor Authentication Generator',
-      description: 'Browser-based TOTP and QR setup helper.',
-      path: '/two-factor-auth',
-    }),
+    structuredData: buildToolPageStructuredData('/two-factor-auth'),
   },
   {
     path: '/random-data-generator',
@@ -72,11 +56,7 @@ const toolRoutes: RouteMeta[] = [
       'Generate cryptographically secure random strings, API keys, tokens, and UUIDs in your browser.',
     keywords: 'random data generator, API key generator, token generator, UUID generator',
     canonical: `${SITE_URL}/random-data-generator`,
-    structuredData: buildWebApplicationSchema({
-      name: 'Random Data Generator',
-      description: 'Generate secure random data locally in the browser.',
-      path: '/random-data-generator',
-    }),
+    structuredData: buildToolPageStructuredData('/random-data-generator'),
   },
   {
     path: '/password-strength-analyzer',
@@ -85,11 +65,7 @@ const toolRoutes: RouteMeta[] = [
       'Analyze password strength, entropy, and common patterns locally. Pattern-based analysis only — no live breach database lookup.',
     keywords: 'password strength analyzer, password checker, entropy analysis',
     canonical: `${SITE_URL}/password-strength-analyzer`,
-    structuredData: buildWebApplicationSchema({
-      name: 'Password Strength Analyzer',
-      description: 'Local password strength and pattern analysis.',
-      path: '/password-strength-analyzer',
-    }),
+    structuredData: buildToolPageStructuredData('/password-strength-analyzer'),
   },
 ];
 
@@ -102,11 +78,7 @@ export const routeMetaList: RouteMeta[] = [
     keywords:
       'security tools, password generator, text encryptor, 2FA generator, random data generator, password analyzer',
     canonical: SITE_URL,
-    structuredData: buildWebApplicationSchema({
-      name: 'SecureTools',
-      description: 'Professional security and privacy tools that run entirely in your browser.',
-      path: '/',
-    }),
+    structuredData: buildHomepageStructuredData(),
   },
   ...toolRoutes,
   {

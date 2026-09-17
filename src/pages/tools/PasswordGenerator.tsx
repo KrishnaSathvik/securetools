@@ -14,9 +14,10 @@ import { Badge } from '@/components/ui/badge';
 import { Copy, RefreshCw, Download, Shield, Clock, Eye, EyeOff, Key, Zap, Lock, Target, CheckCircle } from 'lucide-react';
 import { ToolTrustSection, buildTrustDetailsAccordionSection } from '@/components/ToolTrustSection';
 import { ToolDetailsAccordion } from '@/components/ToolDetailsAccordion';
+import { ToolDiscoverySection } from '@/components/ToolDiscoverySection';
 import { useToast } from '@/hooks/use-toast';
 import { useSEO } from '@/hooks/useSEO';
-import { buildWebApplicationSchema } from '@/lib/seo/structuredData';
+import { buildToolPageStructuredData } from '@/lib/seo/structuredData';
 import { trackTextProcessing, trackInteraction, trackToolUsage, trackPasswordGeneration, trackConversion } from '@/lib/analytics';
 
 // EFF Diceware word list (first 100 words for demo)
@@ -60,11 +61,7 @@ const PasswordGenerator = () => {
     description: 'Generate cryptographically secure passwords and memorable passphrases with entropy analysis, Diceware support, and printable cards.',
     keywords: 'password generator, passphrase generator, diceware, entropy, security, printable passwords',
     canonical: 'https://www.securetools.dev/password-generator',
-    structuredData: buildWebApplicationSchema({
-      name: 'Password & Passphrase Generator',
-      description: 'Generate secure passwords and passphrases in your browser.',
-      path: '/password-generator',
-    }),
+    structuredData: buildToolPageStructuredData('/password-generator'),
   });
 
   // Load password history from localStorage
@@ -753,6 +750,8 @@ const PasswordGenerator = () => {
             },
           ]}
         />
+
+        <ToolDiscoverySection path="/password-generator" />
       </div>
     </ToolLayout>
   );
